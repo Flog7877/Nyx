@@ -15,3 +15,6 @@ export { default as HomeIcon} from "./HomeIcon";
 export { default as CategoriesIcon } from "./CategoriesIcon";
 export { default as StatisticsIcon } from "./StatisticsIcon";
 export { default as QuestionmarkIcon } from "./QuestionmarkIcon";
+export { default as StopIcon } from "./StopIcon";
+export { default as DeleteIcon } from "./DeleteIcon";
+export { default as WarningIcon } from "./WarningIcon";

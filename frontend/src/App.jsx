@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Layout from './components/Layout';
-//import NavBar from './components/NavBar';
 
 import Register from './pages/Register';
 import Login from './pages/Login';
@@ -18,8 +17,37 @@ import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import Support from './pages/Support';
 import { AuthProvider } from './AuthContext';
-
+import { WarningIcon } from './assets/icons/icons';
+ 
 const App = () => {
+
+    const [isTooSmall, setIsTooSmall] = useState(window.innerWidth < 500);
+
+    useEffect(() => {
+        function handleResize() {
+            setIsTooSmall(window.innerWidth < 500);
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    if (isTooSmall) {
+        return (
+            <div style={{
+                textAlign: 'center',
+                marginTop: '2rem',
+                padding: '1rem'
+            }}>
+                <h2><WarningIcon />Kleine Bildschirme werden noch nicht unterstützt.</h2>
+                <p>
+                    Im Moment kann die Seite nur auf Bildschirmen, die eine Mindestbreite von 700px haben, angezeigt werden.
+                </p>
+            </div>
+        );
+    }
     return (
         <AuthProvider>
             <Router>

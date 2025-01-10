@@ -14,6 +14,8 @@ import {
   PauseIcon,
   SaveIcon,
   TimerIcon1,
+  StopIcon,
+  DeleteIcon,
   TimerIcon2
 } from '../assets/icons/icons';
 
@@ -869,7 +871,7 @@ const Timer = () => {
         </div>
 
         <button onClick={handleReset} style={{ marginLeft: '10px' }}>
-          Reset
+          <StopIcon width='25px' style={{ verticalAlign: '-7px' }} /> Reset
         </button>
 
         <div className="tooltip" style={{ display: 'inline-block', marginLeft: '10px' }}>
@@ -892,6 +894,7 @@ const Timer = () => {
 
       {mode === MODES.POMODORO && (
         <div style={{ marginTop: '10px' }}>
+          <br></br>
           <p><strong>Runde:</strong> {round}</p>
           <p><strong>Status:</strong> {isFocusPhase ? 'Fokus' : 'Pause'}</p>
         </div>
@@ -899,6 +902,7 @@ const Timer = () => {
 
       {mode === MODES.PING && (
         <div style={{ marginTop: '10px' }}>
+          <br></br>
           <p><strong>Pings bisher:</strong> {pingCount}</p>
         </div>
       )}
@@ -969,12 +973,12 @@ const Timer = () => {
 
       {saveFeedback && <p style={{ marginTop: '10px' }}>{saveFeedback}</p>}
       {!isFullscreen && (
-        <div style={{ marginTop: '20px', paddingTop: '10px' }}>
+        <div style={{ marginTop: '20px', borderTop: '1px solid' }}>
           <h3>Vergangene Zeit</h3>
           <p><strong>Fokuszeit:</strong> {formatTime(elapsedFocusTime)}</p>
           <p><strong>Pausenzeit:</strong> {formatTime(elapsedPauseTime)}</p>
           <button onClick={clearElapsedTimes} style={{ marginTop: '2px' }}>
-            Clear Session
+          <DeleteIcon width='18px' style={{ verticalAlign: '-3px' }} /> Clear Session
           </button>
         </div>
       )}
