@@ -139,7 +139,7 @@ function Settings() {
     <div>
       <h1>Einstellungen</h1>
       <p>
-        Bei Fragen: support@flo-g.de
+        Hier können persönliche Präferenzen eingestellt werden und Benutzer*in-Informationen angepasst werden.
       </p>
       {message && <p>{message}</p>}
 
@@ -231,7 +231,7 @@ function Settings() {
         Benutzer löschen
       </button>
       <p>
-        Hinweis: Die Route für das Löschen ist noch Fehlerhaft (lustige SQL `Key constraint` Dinge).
+        Hinweis: Die Route für das Löschen ist noch Fehlerhaft.
       </p>
     </div>
   );

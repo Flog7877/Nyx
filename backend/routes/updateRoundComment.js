@@ -1,20 +1,17 @@
 const db = require('../config/db');
 
 async function updateRoundComment(req, res) {
-    console.log('updateRoundComment aufgerufen mit Params:', req.params, 'Body:', req.body);
 
     const userId = req.user.userId;
     const { sessionId, roundNr } = req.params;
     const { comment } = req.body;
 
-    // Abrufen der Session
     let session;
     try {
         const [rows] = await db.query(
             'SELECT extra_data FROM sessions WHERE id = ? AND user_id = ?',
             [sessionId, userId]
         );
-        console.log('Datenbankabfrage erfolgreich:', rows);
         if (!rows || rows.length === 0) {
             return res.status(404).json({ error: 'Session nicht gefunden.' });
         }
@@ -24,7 +21,6 @@ async function updateRoundComment(req, res) {
         return res.status(500).json({ error: 'Datenbankfehler beim Abrufen der Session.' });
     }
 
-    // Parsing von extra_data und Aktualisierung des Rundensatzes
     let extraData;
     try {
         if (typeof session.extra_data === 'string') {
@@ -55,8 +51,6 @@ async function updateRoundComment(req, res) {
             'UPDATE sessions SET extra_data = ? WHERE id = ? AND user_id = ?',
             [JSON.stringify(extraData), sessionId, userId]
         );
-        console.log('Update erfolgreich:', result);
-        console.log('Antworte mit Erfolg.');
         return res.json({ message: 'Rundenkommentar aktualisiert.' });
     } catch (err) {
         console.error('Fehler beim Aktualisieren der Session:', err);

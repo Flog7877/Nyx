@@ -89,7 +89,7 @@ function RoundRow({ runde, onCommentUpdate }) {
             <button onClick={() => setIsEditing(false)}>✖️</button>
           </>
         ) : (
-          <button onClick={() => setIsEditing(true)}>...</button>
+          <button onClick={() => setIsEditing(true)}><EditIcon width="16px" /></button>
         )}
       </td>
     </tr>

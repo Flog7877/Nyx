@@ -23,10 +23,8 @@ async function login(req, res) {
   }
   try {
     const initialQuery = await db.query(query, [identifier]);
-    //console.log(initialQuery);
     results = initialQuery[0];
     user = results[0];
-    //console.log('Der User: ', user);
     try {
       accessToken = jwt.sign({ userId: user.id }, secretKey, { expiresIn: '30m' });
       refreshToken = jwt.sign({ userId: user.id }, secretKey, { expiresIn: '14d' });
@@ -49,7 +47,9 @@ async function login(req, res) {
   }
   try {
     const udtQuery = await db.query(updateQuery, [refreshToken, user.id]);
-    //console.log(udtQuery);
+    const now = new Date();
+    const loginDate = `${now.getDate()}.${now.getMonth() < 12 ? now.getMonth()+1 : 12}.${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`
+    console.log(`[${loginDate}] User eingeloggt:`, user.username);
     return res.json({
       accessToken,
       refreshToken,
