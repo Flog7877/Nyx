@@ -1,11 +1,11 @@
 # TODO
 
 **Priorität:** 
-- [ ] Normale Stoppuhr hinzufügen
-- [ ] SQL Verbindungspool einrichten
-- [ ] Sicherstellen, dass Verbindung immer möglich ist / `catch` in der API
 - [ ] Backend Monitoring!!!
 - [ ] Nach Kategorie filtern (in den Statistiken)  
+- [ ] Notification-Modus (Windows)
+- [ ] Standart-Werte pro Kategorie 
+- [ ] select to delete bei kategorien
 
 **Semi-Wichtig:**
 - [ ] Passwort-Logik auch in den Einstellungen und beim Zurücksetzen!
@@ -16,8 +16,6 @@
 - [ ] `Delete` API für Nutzer funktionsfähig machen (liegt an komplexen `constraint`-Zusammenhängen)  
 
 **Für die Zukunft:** 
-- [ ] Logo richtig erstellen
-- [ ] Eine Maske über die Zeit-Eingabe legen (wie bei `PomodoroS`)
 - [ ] Eigene Sounds in den Einstellungen hochladen (?)
 - [ ] Styling (da fehlt noch viel).
 
