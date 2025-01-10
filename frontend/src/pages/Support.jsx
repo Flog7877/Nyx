@@ -60,7 +60,7 @@ function Support() {
       </p>
       {!user ? (
         <p style={{ marginTop: '1rem' }}>
-          Melde dich an, um eine Nachricht zu schicken! 
+          Um Nachrichten und Feedback zu senden, ist eine Anmeldung notwendig. 
         </p>
       ) : (
         <form onSubmit={handleSubmit} style={{ marginTop: '1rem' }}>

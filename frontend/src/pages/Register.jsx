@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { registerUser } from '../api';
 import ResendVerification from './ResendVerification';
+import '../assets/Styles/Register.css'
 
 const Register = () => {
     const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '' });
@@ -77,9 +78,10 @@ const Register = () => {
         <div>
             <h2>Registrieren</h2>
             <form onSubmit={handleSubmit}>
-                <div>
+                <div className='register-field'>
                     <label>Benutzername:</label>
                     <input
+                        className='register-input'
                         type="text"
                         name="username"
                         value={formData.username}
@@ -87,9 +89,10 @@ const Register = () => {
                         required
                     />
                 </div>
-                <div>
+                <div className='register-field'>
                     <label>E-Mail:</label>
                     <input
+                        className='register-input'
                         type="email"
                         name="email"
                         value={formData.email}
@@ -97,9 +100,10 @@ const Register = () => {
                         required
                     />
                 </div>
-                <div>
+                <div className='register-field'>
                     <label>Passwort:</label>
                     <input
+                        className='register-input'
                         type="password"
                         name="password"
                         value={formData.password}
@@ -108,9 +112,10 @@ const Register = () => {
                         autoComplete="new-password"
                     />
                 </div>
-                <div>
+                <div className='register-field'>
                     <label>Passwort bestätigen:</label>
                     <input
+                        className='register-input'
                         type="password"
                         name="confirmPassword"
                         value={formData.confirmPassword}

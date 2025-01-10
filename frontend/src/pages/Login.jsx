@@ -6,7 +6,7 @@ import { AuthContext } from '../AuthContext';
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useContext(AuthContext); 
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -19,7 +19,7 @@ const Login = () => {
       localStorage.setItem('user_id', user_id);
       localStorage.setItem('username', username);
       login({ userId: user_id, username });
-      navigate('/timer'); 
+      navigate('/timer');
     } catch (err) {
       console.error('Fehler beim Login. ', err);
       alert('Login fehlgeschlagen.');
@@ -30,24 +30,30 @@ const Login = () => {
     <div>
       <h1>Login</h1>
       <form onSubmit={handleLogin}>
-        <label>
-          Benutzername oder E-Mail:
-          <input
-            type="text"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Passwort:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
+        <div style={{ marginBottom: '10px' }}>
+          <label>
+            Benutzername oder E-Mail:
+            <input
+              style={{ marginLeft: '10px' }}
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              required
+            />
+          </label>
+        </div>
+        <div style={{ marginBottom: '10px' }}>
+          <label>
+            Passwort:
+            <input
+              style={{ marginLeft: '10px' }}
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+        </div>
         <button type="submit">Einloggen</button>
       </form>
       <p>
@@ -55,7 +61,7 @@ const Login = () => {
       </p>
       <p>
         Noch nicht registriert?
-        <Link to="/register" style={{ marginLeft:'8px' }}>
+        <Link to="/register" style={{ marginLeft: '8px' }}>
           Hier registrieren
         </Link>
       </p>
