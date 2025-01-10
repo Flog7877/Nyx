@@ -89,7 +89,7 @@ const Timer = () => {
   const [errors, setErrors] = useState({});
   const [saveFeedback, setSaveFeedback] = useState(null);
 
-  const [circleSize, setCircleSize] = useState(400);
+  const [circleSize, setCircleSize] = useState(300);
 
   const [c_rounds, setCRounds] = useState([]);
   const [roundComment, setRoundComment] = useState('');
@@ -123,23 +123,28 @@ const Timer = () => {
   }, [mode]);
 
   useEffect(() => {
-    const updateSize = () => {
+    function updateSize() {
       if (isFullscreen) {
         const newSize = Math.min(
-          Math.max(window.innerWidth * 0.45, 150),
+          Math.floor(window.innerWidth * 0.8),
+          Math.floor(window.innerHeight * 0.5),
           600
         );
         setCircleSize(newSize);
       } else {
         setCircleSize(300);
       }
+    }
 
-      window.addEventListener('resize', updateSize)
-    };
     updateSize();
+    window.addEventListener('resize', updateSize);
 
-    return () => window.removeEventListener('resize', updateSize);
+    return () => {
+      window.removeEventListener('resize', updateSize);
+    };
   }, [isFullscreen]);
+
+
 
 
   useEffect(() => {
@@ -821,7 +826,7 @@ const Timer = () => {
               )}
             </div>
           )}
-          <br></br>
+          <br></br><br></br>
         </div>
       )}
       <div
@@ -841,19 +846,6 @@ const Timer = () => {
           {formatTime(timeLeft)}
         </div>
       </div>
-
-      {mode === MODES.POMODORO && (
-        <div style={{ marginTop: '10px' }}>
-          <p><strong>Runde:</strong> {round}</p>
-          <p><strong>Status:</strong> {isFocusPhase ? 'Fokus' : 'Pause'}</p>
-        </div>
-      )}
-
-      {mode === MODES.PING && (
-        <div style={{ marginTop: '10px' }}>
-          <p><strong>Pings bisher:</strong> {pingCount}</p>
-        </div>
-      )}
 
       <div
         className='buttonWrapper'
@@ -896,14 +888,24 @@ const Timer = () => {
             </span>
           )}
         </div>
-
-        <button onClick={clearElapsedTimes} style={{ marginLeft: '10px' }}>
-          Clear Session
-        </button>
       </div>
 
-      {mode === MODES.CHRONOGRAPH && (
+      {mode === MODES.POMODORO && (
         <div style={{ marginTop: '10px' }}>
+          <p><strong>Runde:</strong> {round}</p>
+          <p><strong>Status:</strong> {isFocusPhase ? 'Fokus' : 'Pause'}</p>
+        </div>
+      )}
+
+      {mode === MODES.PING && (
+        <div style={{ marginTop: '10px' }}>
+          <p><strong>Pings bisher:</strong> {pingCount}</p>
+        </div>
+      )}
+
+      {(mode === MODES.CHRONOGRAPH && !isFullscreen) && (
+        <div style={{ marginTop: '10px' }}>
+          <br></br>
           <div>
             <button onClick={handleNewRound}>Runde setzen</button>
             <input
@@ -971,6 +973,9 @@ const Timer = () => {
           <h3>Vergangene Zeit</h3>
           <p><strong>Fokuszeit:</strong> {formatTime(elapsedFocusTime)}</p>
           <p><strong>Pausenzeit:</strong> {formatTime(elapsedPauseTime)}</p>
+          <button onClick={clearElapsedTimes} style={{ marginTop: '2px' }}>
+            Clear Session
+          </button>
         </div>
       )}
       <button
@@ -985,5 +990,5 @@ const Timer = () => {
     </div>
   );
 };
-// Test
+
 export default Timer;

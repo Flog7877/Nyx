@@ -17,12 +17,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    overflow: auto;
     padding: 0 !important;
 }
 
 .fullscreen-mode .timer-display {
-    font-size: clamp(2rem, 10vw, 7rem) !important;
+    font-size: clamp(2rem, 4vw, 5rem) !important;
     text-align: center;
 }
 
@@ -40,6 +40,12 @@
     margin-bottom: 1em;
 }
 
+.buttonWrapper {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
 .timer-display {
     top: 50%;
     left: 50%;
@@ -49,17 +55,14 @@
     color: #FFFFFF;
 }
 
-/* Styling für die gesamte Eingabemaske */
 .html-duration-picker-input-controls-wrapper {
     position: relative;
     display: inline-block;
     background: transparent;
 }
 
-/* Styling für die Auf-/Ab-Buttons */
 .html-duration-picker-input-controls-wrapper .scroll-btn {
     background-color: #BB86FC;
-    /* Deine Akzentfarbe */
     border: none;
     color: #FFFFFF;
     width: 20px;
@@ -81,7 +84,6 @@
     box-shadow: 0 0 4px #BB86FC;
 }
 
-/* Styling für die Pfeile */
 .html-duration-picker-input-controls-wrapper .caret {
     border-color: transparent transparent #FFFFFF transparent;
     border-width: 0 4px 5px 4px;
@@ -92,21 +94,17 @@
     height: 0;
 }
 
-/* Styling für den nach unten gerichteten Pfeil */
 .html-duration-picker-input-controls-wrapper .caret.caret-down {
     border-color: #FFFFFF transparent transparent transparent;
 }
 
-/* Buttons anpassen: Position */
 .html-duration-picker-input-controls-wrapper .controls {
     position: absolute;
     right: -28px;
-    /* Abstand rechts vom Eingabefeld */
     top: 50%;
     transform: translateY(-50%);
 }
 
-/* Reduziere die Größe der Buttons bei kleineren Bildschirmen */
 @media (max-width: 768px) {
     .html-duration-picker-input-controls-wrapper .scroll-btn {
         width: 16px;

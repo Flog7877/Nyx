@@ -1,7 +1,14 @@
 .popup-content {
-    display: none;
-  }
+  display: none;
+}
 
 .popup-wrapper:hover .popup-content {
-    display: block;
-  }
+  display: block;
+}
+
+/*  border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '90%' }}*/
+
+.statistics-table {
+  border: 1;
+  max-width: 700px;
+}

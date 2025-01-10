@@ -1,7 +1,7 @@
 set -e
 
 function confirm_continue() {
-    read -p "Alle Änderungen gepusht? (Y/N): " choice
+    read -p "Änderungen gepusht und auf der richtigen Branch? (y/n): " choice
     case "$choice" in
         y|Y ) echo "Fortfahren...";;
         n|N ) echo "Abgebrochen."; exit 1;;

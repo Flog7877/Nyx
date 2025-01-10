@@ -217,7 +217,7 @@ function Statistics() {
       <h1>Statistiken</h1>
       {message && <p>{message}</p>}
 
-      <table border="1" cellPadding="6" style={{ borderCollapse: 'collapse', width: '90%' }}>
+      <table border="1" cellPadding="6" className='statistics-table'>
         <thead>
           <tr>
             <th>ID</th>
@@ -240,7 +240,7 @@ function Statistics() {
                 Beginn: {s.start_time ? formatDateTime(s.start_time) : '-'}<br />
                 Ende: {s.created_at ? formatDateTime(s.created_at) : '-'}
               </td>
-              <td>{s.category_name || '-'}</td>
+              <td>{s.category_name || ''}</td>
               <td>{s.modus}</td>
               <td>{renderInfo(s)}</td>
               <td>{formatTime(s.focusTime)}</td>
@@ -258,7 +258,7 @@ function Statistics() {
         <div style={modalStyle}>
           <h2>Runden für Session {modalSessionId}</h2>
           <button onClick={() => setShowRoundsModal(false)}>Schließen</button>
-          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+          <table border={1} style={{ borderCollapse: 'collapse', width: '100%' }}>
             <thead>
               <tr>
                 <th>Nr</th>
