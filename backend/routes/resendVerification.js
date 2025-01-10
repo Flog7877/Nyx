@@ -59,7 +59,7 @@ async function resendVerification(req, res) {
         return res.status(500).json({ error: 'Datenbankfehler. Neues Verifikationstoken konnte nicht gesetzt werden.' });
     }
 
-    const verifyLink = `https://flo-g.de/Nyx/verify?token=${newToken}`;
+    const verifyLink = `https://nyx.flo-g.de/verify?token=${newToken}`;
     //const verifyLink = `http://localhost:5173/Nyx/verify?token=${newToken}`;
     const mailOptions = {
         from: '"Flo (noreply)" <noreply@flo-g.de>',

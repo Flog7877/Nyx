@@ -66,7 +66,7 @@ async function register(req, res) {
             return res.status(500).json({ error: 'Datenbankfehler.' });
         };
 
-        const verifyLink = `https://flo-g.de/Nyx/verify?token=${verification_token}`;
+        const verifyLink = `https://nyx.flo-g.de/verify?token=${verification_token}`;
         //const verifyLink = `http://localhost:5173/Nyx/verify?token=${verification_token}`;
 
         const mailOptions = {

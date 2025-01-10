@@ -19,7 +19,7 @@ async function supportRouter(req, res) {
 
     const lastSent = rateLimitMap.get(spamKey);
     const now = Date.now();
-    const COOLDOWN_MS = 60 * 1000; // 60 Sekunden
+    const COOLDOWN_MS = 60 * 1000; 
 
     if (lastSent && now - lastSent < COOLDOWN_MS) {
       return res.status(429).json({
@@ -38,14 +38,11 @@ async function supportRouter(req, res) {
         return res.status(400).json({ error: 'Name und E-Mail werden benötigt.' });
       }
     }
-
-    // Angenommen, du verwendest mysql2/promise:
     const queryInsert = `
 INSERT INTO support_messages (user_id, name, email, message_text)
 VALUES (?, ?, ?, ?)
 `;
 
-    // 1) Insert
     const [insertResult] = await db.query(queryInsert, [
       userId,
       name || null,
@@ -53,7 +50,6 @@ VALUES (?, ?, ?, ?)
       message
     ]);
 
-    // 2) Hole neue ID
     const newId = insertResult.insertId;
 
     const [rows] = await db.query(
@@ -62,7 +58,6 @@ VALUES (?, ?, ?, ?)
     );
     const createdAt = rows[0]?.created_at || null;
 
-    // 1) Mail-Versand (vor dem finalen return!)
     const mailOptions = {
       from: '"Nyx Support" <no-reply@flo-g.de>',
       to: 'support@flo-g.de',
@@ -79,11 +74,10 @@ VALUES (?, ?, ?, ?)
       if (mailErr) {
         console.error('Fehler beim Versenden der Mail:', mailErr);
       } else {
-        console.log('Verifizierungs-Mail gesendet:', info.response);
+        console.log('Support-Mail gesendet:', info.response);
       }
     });
 
-    // 2) Nun das finale return:
     return res.json({
       success: true,
       message: 'Nachricht erfolgreich gesendet!',
