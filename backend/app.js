@@ -45,7 +45,7 @@ router.use(express.json());
 
 // --- Routen ----
 
-const login = require('./routes/login'); 
+const login = require('./routes/login');
 const register = require('./routes/register');
 const verifyMail = require('./routes/verifyMail');
 const resendVerification = require('./routes/resendVerification');
@@ -53,7 +53,7 @@ const users = require('./routes/users');
 const deleteUser = require('./routes/userDelete');
 const validateToken = require('./routes/validateToken');
 const refreshToken = require('./routes/refreshToken');
-const logout = require('./routes/logout'); 
+const logout = require('./routes/logout');
 const getSettings = require('./routes/settings');
 const changeUsername = require('./routes/changeUsername');
 const changePassword = require('./routes/changePassword');
@@ -69,56 +69,59 @@ const getSessions = require('./routes/getSessions');
 const editSession = require('./routes/editSession');
 const deleteSession = require('./routes/deleteSession');
 const updateRoundComment = require('./routes/updateRoundComment');
+const supportRouter = require('./routes/support');
 
 // ----------------------------------------------------------------------------
 
-app.post('/api/register', register );
+app.post('/api/register', register);
 
-app.get('/api/verify', verifyMail );
-  
-app.post('/api/resendVerification', resendVerification );
+app.get('/api/verify', verifyMail);
 
-app.post('/api/users', users );
+app.post('/api/resendVerification', resendVerification);
 
-app.delete('/api/settings/user', verifyToken, checkVerified, deleteUser );
+app.post('/api/users', users);
 
-app.post('/api/login', login );
+app.delete('/api/settings/user', verifyToken, checkVerified, deleteUser);
 
-app.get('/api/validate-token', verifyToken, validateToken );
+app.post('/api/login', login);
 
-app.post('/api/refresh-token', refreshToken );
+app.get('/api/validate-token', verifyToken, validateToken);
 
-app.post('/api/logout', verifyToken, logout );
+app.post('/api/refresh-token', refreshToken);
 
-app.get('/api/settings', verifyToken, checkVerified, getSettings );
+app.post('/api/logout', verifyToken, logout);
 
-app.put('/api/settings/username', verifyToken, checkVerified, changeUsername );
+app.get('/api/settings', verifyToken, checkVerified, getSettings);
 
-app.put('/api/settings/password', verifyToken, checkVerified, changePassword );
+app.put('/api/settings/username', verifyToken, checkVerified, changeUsername);
 
-app.put('/api/settings', verifyToken, checkVerified, changeSettings );
+app.put('/api/settings/password', verifyToken, checkVerified, changePassword);
 
-app.post('/api/forgotPassword', forgotPassword );
+app.put('/api/settings', verifyToken, checkVerified, changeSettings);
 
-app.post('/api/resetPassword', resetPassword );
+app.post('/api/forgotPassword', forgotPassword);
 
-app.get('/api/categories', verifyToken, checkVerified, getCategories );
+app.post('/api/resetPassword', resetPassword);
 
-app.post('/api/categories', verifyToken, checkVerified, addCategory );
+app.get('/api/categories', verifyToken, checkVerified, getCategories);
 
-app.put('/api/categories/:id', verifyToken, checkVerified, editCategory );
+app.post('/api/categories', verifyToken, checkVerified, addCategory);
 
-app.delete('/api/categories/:id', verifyToken, checkVerified, deleteCategory );
+app.put('/api/categories/:id', verifyToken, checkVerified, editCategory);
 
-app.post('/api/sessions', verifyToken, checkVerified, saveSession );
+app.delete('/api/categories/:id', verifyToken, checkVerified, deleteCategory);
 
-app.get('/api/sessions', verifyToken, checkVerified, getSessions );
+app.post('/api/sessions', verifyToken, checkVerified, saveSession);
 
-app.put('/api/sessions/:id', verifyToken, checkVerified, editSession );
+app.get('/api/sessions', verifyToken, checkVerified, getSessions);
 
-app.delete('/api/sessions/:id', verifyToken, checkVerified, deleteSession );
+app.put('/api/sessions/:id', verifyToken, checkVerified, editSession);
+
+app.delete('/api/sessions/:id', verifyToken, checkVerified, deleteSession);
 
 app.post('/api/sessions/:sessionId/rounds/:roundNr', verifyToken, checkVerified, updateRoundComment);
+
+app.post('/api/support', verifyToken, supportRouter);
 
 // --------------------------------------------------------------------------------------
 
@@ -128,7 +131,7 @@ app.use(router);
 
 app.get('/api/test', (req, res) => {
   res.send('Das Backend funktioniert!');
-}); 
+});
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server läuft auf http://0.0.0.0:${port}`);

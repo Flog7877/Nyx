@@ -179,4 +179,13 @@ export const resendVerification = async (email) => {
       throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
     }
   };
-  
+
+
+export const sendSupportMessage = async (payload) => {
+  try {
+    const response = await API.post('/support', payload);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
+  }
+};

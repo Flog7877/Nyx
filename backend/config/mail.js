@@ -1,20 +1,3 @@
-// Alte Version 
-/*
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-  host: 'mail.flo-g.de', 
-  port: 587,
-  secure: false,        
-  auth: {
-    user: 'noreply@flo-g.de',
-    pass: 'NFm2TKGkYdts' 
-  },
-});
-
-module.exports = transporter;
-*/
-
 const nodemailer = require('nodemailer');
 require('dotenv').config(); 
 

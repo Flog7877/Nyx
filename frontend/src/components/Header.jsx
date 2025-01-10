@@ -27,7 +27,7 @@ function Header({ onBurgerClick }) {
                         alt="Nyx-Icon"
                         className="header-logo"
                     />
-                    <span className="header-project-name">Nyx</span>
+                    <span className="header-project-name">Projekt Nyx</span>
                     <span className="header-version-badge">v0.1.1</span>
                 </div>
             </div>

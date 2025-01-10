@@ -10,11 +10,10 @@ const verifyToken = (req, res, next) => {
     }
     const token = authHeader.split(' ')[1];
     try {
-        const decoded = jwt.verify(token, secretKey);  // Deklaration von decoded hier
+        const decoded = jwt.verify(token, secretKey); 
         req.user = { userId: decoded.userId };
         next();
     } catch (err) {
-        // Vermeide die Verwendung von decoded hier, da es undefiniert sein könnte
         console.error(`Ungültiges Token:`, err.message);
         return res.status(401).json({ error: 'Ungültiges Token.' });
     }
