@@ -59,7 +59,7 @@ VALUES (?, ?, ?, ?)
     const createdAt = rows[0]?.created_at || null;
 
     const mailOptions = {
-      from: '"Nyx Support" <no-reply@flo-g.de>',
+      from: '"Support-Feld" <no-reply@flo-g.de>',
       to: 'support@flo-g.de',
       subject: 'Neue Support-Nachricht',
       text: `Neue Support-Nachricht:

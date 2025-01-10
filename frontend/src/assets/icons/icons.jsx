@@ -18,3 +18,6 @@ export { default as QuestionmarkIcon } from "./QuestionmarkIcon";
 export { default as StopIcon } from "./StopIcon";
 export { default as DeleteIcon } from "./DeleteIcon";
 export { default as WarningIcon } from "./WarningIcon";
+export { default as EditIcon } from "./EditIcon";
+export { default as DropDownRightIcon } from "./DropDownRightIcon";
+export { default as DropDownDownIcon } from "./DropDownDownIcon";
