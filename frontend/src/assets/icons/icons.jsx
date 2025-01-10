@@ -1,0 +1,17 @@
+export { default as MaximizeIcon } from "./MaximizeIcon ";
+export { default as MinimizeIcon } from "./MinimizeIcon";
+export { default as PlayIcon } from "./PlayIcon";
+export { default as PauseIcon } from "./PauseIcon";
+export { default as SaveIcon } from "./SaveIcon";
+export { default as TimerIcon1 } from "./TimerIcon1";
+export { default as TimerIcon2 } from "./TimerIcon2";
+export { default as UserIcon } from "./UserIcon";
+export { default as SettingsIcon } from "./SettingsIcon";
+export { default as DefaultIcon } from "./DefaultIcon";
+export { default as SidebarIcon} from "./SidebarIcon";
+export { default as LoginIcon } from "./LoginIcon";
+export { default as LogoutIcon } from "./LogoutIcon";
+export { default as HomeIcon} from "./HomeIcon";
+export { default as CategoriesIcon } from "./CategoriesIcon";
+export { default as StatisticsIcon } from "./StatisticsIcon";
+export { default as QuestionmarkIcon } from "./QuestionmarkIcon";

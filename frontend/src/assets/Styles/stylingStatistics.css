@@ -1,0 +1,7 @@
+.popup-content {
+    display: none;
+  }
+
+.popup-wrapper:hover .popup-content {
+    display: block;
+  }

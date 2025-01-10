@@ -1,0 +1,108 @@
+const express = require('express');
+const db = require('./config/db'); // Importiere die MySQL-Verbindung
+const app = express();
+const port = 3000;
+
+// Middleware zur Verarbeitung von JSON-Daten
+app.use(express.json());
+
+// Beispiel-Route: Verbindung testen
+app.get('/', (req, res) => {
+  res.send('Pomodoro-App läuft!');
+});
+
+// Beispiel-Route: Benutzer abrufen
+app.get('/api/users', (req, res) => {
+  db.query('SELECT * FROM users', (err, results) => {
+    if (err) {
+      console.error('Fehler beim Abrufen der Benutzer:', err);
+      return res.status(500).json({ error: 'Datenbankfehler' });
+    }
+    res.status(200).json(results);
+  });
+});
+
+// 1. Benutzer-API
+
+// a. Benutzer erstellen
+const bcrypt = require('bcrypt');
+
+app.post('/api/users', async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Benutzername und Passwort erforderlich' });
+  }
+
+  try {
+    // Passwort hashen
+    const saltRounds = 10;
+    const password_hash = await bcrypt.hash(password, saltRounds);
+
+    const query = 'INSERT INTO users (username, password_hash) VALUES (?, ?)';
+    db.query(query, [username, password_hash], (err, results) => {
+      if (err) {
+        console.error('Fehler beim Erstellen des Benutzers:', err);
+        return res.status(500).json({ error: 'Datenbankfehler' });
+      }
+      res.status(201).json({ message: 'Benutzer erstellt', userId: results.insertId });
+    });
+  } catch (err) {
+    console.error('Fehler beim Hashen des Passworts:', err);
+    res.status(500).json({ error: 'Interner Serverfehler' });
+  }
+});
+
+
+// b. Alle Benutzer abrufen (für Debugging)
+app.get('/api/users', (req, res) => {
+  const query = 'SELECT id, username, created_at FROM users';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Fehler beim Abrufen der Benutzer:', err);
+      return res.status(500).json({ error: 'Datenbankfehler' });
+    }
+    res.status(200).json(results);
+  });
+});
+
+// 2. Sitzungs-API
+
+// a. Sitzung erstellen
+app.post('/api/sessions', (req, res) => {
+  const { user_id, duration, mode } = req.body;
+
+  if (!user_id || !duration || !mode) {
+    return res.status(400).json({ error: 'Benutzer-ID, Dauer und Modus erforderlich' });
+  }
+
+  const query = 'INSERT INTO sessions (user_id, duration, mode) VALUES (?, ?, ?)';
+  db.query(query, [user_id, duration, mode], (err, results) => {
+    if (err) {
+      console.error('Fehler beim Erstellen der Sitzung:', err);
+      return res.status(500).json({ error: 'Datenbankfehler' });
+    }
+    res.status(201).json({ message: 'Sitzung erstellt', sessionId: results.insertId });
+  });
+});
+
+// b. Sitzungen eines Benutzers abrufen
+app.get('/api/sessions/:user_id', (req, res) => {
+  const user_id = req.params.user_id;
+
+  const query = 'SELECT * FROM sessions WHERE user_id = ?';
+  db.query(query, [user_id], (err, results) => {
+    if (err) {
+      console.error('Fehler beim Abrufen der Sitzungen:', err);
+      return res.status(500).json({ error: 'Datenbankfehler' });
+    }
+    res.status(200).json(results);
+  });
+});
+
+// Server starten
+app.listen(port, () => {
+  console.log(`Server läuft auf http://localhost:${port}`);
+});
+
+

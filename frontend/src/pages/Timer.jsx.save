@@ -1,0 +1,352 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+// Webworker-Setup
+const createWorker = (callback) => {
+    const blob = new Blob(
+        [
+            `onmessage = function(e) {
+                const { interval } = e.data;
+                setInterval(() => postMessage({ type: 'tick' }), interval);
+            }`,
+        ],
+        { type: 'application/javascript' }
+    );
+    const worker = new Worker(URL.createObjectURL(blob));
+    worker.onmessage = callback;
+    return worker;
+};
+
+const Timer = () => {
+    // Timer States
+    const [mode, setMode] = useState('Pomodoro');
+    const [timeLeft, setTimeLeft] = useState(25 * 60 * 1000); // Milliseconds
+    const [focusTime, setFocusTime] = useState(25 * 60 * 1000); // Milliseconds
+    const [pauseTime, setPauseTime] = useState(5 * 60 * 1000); // Milliseconds
+    const [freeTime, setFreeTime] = useState(10 * 60 * 1000); // Milliseconds
+    const [pingTime, setPingTime] = useState(0); // Milliseconds
+    const [pingInterval, setPingInterval] = useState(10 * 1000); // Milliseconds
+    const [pingCount, setPingCount] = useState(0);
+    const [round, setRound] = useState(1);
+    const [worker, setWorker] = useState(null);
+    const [sessionId, setSessionId] = useState(null);
+    const navigate = useNavigate();
+
+    // Kategorien States
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+
+    // Benutzerprüfung
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('user_id');
+        const username = localStorage.getItem('username');
+
+        if (!token || !userId || !username) {
+            console.error('Benutzer nicht eingeloggt. Weiterleitung zur Login-Seite.');
+            navigate('/login');
+            return;
+        }
+
+        console.log(`Eingeloggt als: ${username} (ID: ${userId})`);
+    }, [navigate]);
+
+    // Kategorien laden
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await axios.get('http://192.168.0.51:3000/api/categories', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setCategories(response.data.categories || []);
+            } catch (error) {
+                console.error('Fehler beim Laden der Kategorien:', error);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    // Timer-Logik
+    useEffect(() => {
+        if (mode === 'Pomodoro' && timeLeft === 0) {
+            handleAutoSave();
+            if (round % 2 === 1) {
+                setTimeLeft(pauseTime);
+            } else {
+                setTimeLeft(focusTime);
+            }
+            setRound((prev) => prev + 1);
+        } else if (mode === 'Timer' && timeLeft === 0) {
+            handleAutoSave(true);
+            handleReset();
+        }
+    }, [timeLeft, mode, focusTime, pauseTime, round]);
+
+    // Sitzung starten
+const handleStart = async () => {
+    if (!sessionId) {
+        try {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('user_id');
+
+            if (!token || !userId) {
+                console.error('Token oder Benutzer-ID fehlt. Kann keine session_id generieren.');
+                return;
+            }
+
+            const response = await axios.post(
+                'http://192.168.0.51:3000/api/new-session',
+                { user_id: parseInt(userId, 10) },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            setSessionId(response.data.session_id);
+            console.log('Neue session_id generiert:', response.data.session_id);
+        } catch (error) {
+            console.error('Fehler beim Generieren der session_id:', error.response?.data || error.message);
+            return;
+        }
+    }
+
+    if (worker) worker.terminate();
+
+    if (mode === 'Pomodoro') {
+        setTimeLeft(focusTime);
+    } else if (mode === 'Ping') {
+        setPingTime(0);
+    } else if (mode === 'Timer') {
+        setTimeLeft(freeTime);
+    }
+
+const newWorker = createWorker(({ data }) => {
+    if (data.type === 'tick') {
+        if (mode === 'Ping') {
+            setPingTime((prev) => {
+                const newTime = prev + 1000;
+                if (newTime % pingInterval === 0) {
+                    setPingCount((prev) => prev + 1);
+                    if (newTime === pingInterval * pingCount) {
+                        // AutoSave nur einmal pro Intervall
+                        handleAutoSave(true);
+                    }
+                }
+                return newTime;
+            });
+        } else {
+            setTimeLeft((prev) => Math.max(prev - 1000, 0));
+        }
+    }
+});
+
+
+    newWorker.postMessage({ interval: 1000 });
+    setWorker(newWorker);
+};
+
+
+    const handlePause = () => {
+        if (worker) {
+            worker.terminate();
+            setWorker(null);
+        }
+    };
+
+
+
+
+const handleModeChange = async (newMode) => {
+    if (worker) {
+        worker.terminate();
+        setWorker(null);
+    }
+    setMode(newMode);
+    setSessionId(null); // Entfernt die aktuelle session_id
+    console.log('Modus geändert. Session-ID entfernt.');
+
+    await handleStart(); // Sicherstellen, dass eine neue session_id generiert wird
+};
+
+useEffect(() => {
+    // Cleanup bei Fenster schließen
+    const handleBeforeUnload = () => {
+        setSessionId(null);
+        console.log('Fenster wird geschlossen. Session-ID entfernt.');
+    };
+
+    // Hinzufügen des Event-Listeners
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+        // Cleanup beim Entfernen des Timers
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+}, []);
+
+
+
+    // Automatisches Speichern
+    const handleAutoSave = async (completed = false) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('Kein Token gefunden.');
+            return;
+        }
+
+        const userId = localStorage.getItem('user_id');
+        if (!userId) {
+            console.error('Benutzer-ID fehlt. Bitte einloggen.');
+            return;
+        }
+
+        const payload = {
+            session_id: sessionId, // Zufällig generiert
+            user_id: parseInt(userId, 10),
+            category_id: selectedCategory || null,
+            mode,
+            practice: mode === 'Pomodoro' ? (round % 2 === 1 ? 'Fokus' : 'Pause') : 'default',
+            time: mode === 'Ping' ? pingTime : timeLeft, // Millisekunden
+            completed,
+        };
+
+        console.log('Payload:', payload);
+
+// Validierung der Pflichtfelder
+    const missingFields = [];
+    if (!payload.session_id) missingFields.push('session_id');
+    if (!payload.user_id) missingFields.push('user_id');
+    if (!payload.mode) missingFields.push('mode');
+    if (!payload.practice) missingFields.push('practice');
+    if (payload.time === undefined || payload.time === null) missingFields.push('time');
+
+    if (missingFields.length > 0) {
+        console.error(`Pflichtfelder fehlen: ${missingFields.join(', ')}`, payload);
+        return;
+    }
+
+        // Sicherstellen, dass Pflichtfelder gesetzt sind
+        if (
+            (mode === 'Pomodoro' && (!focusTime || !pauseTime)) ||
+            (mode === 'Timer' && !freeTime) ||
+            (mode === 'Ping' && !pingInterval)
+        ) {
+            console.error('Pflichtfelder fehlen:', payload);
+            return;
+        }
+
+        try {
+            const response = await axios.post('http://192.168.0.51:3000/api/sessions', payload, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            console.log('Sitzung erfolgreich gespeichert:', response.data);
+        } catch (error) {
+            console.error(
+                'Fehler beim Speichern der Sitzung:',
+                error.response?.data || error.message
+            );
+        }
+    };
+
+    return (
+        <div>
+            <h1>
+                {mode === 'Pomodoro'
+                    ? round % 2 === 1
+                        ? 'Fokuszeit'
+                        : 'Pause'
+                    : mode}
+            </h1>
+            <h2>{mode === 'Pomodoro' ? `Runde: ${Math.ceil(round / 2)}` : null}</h2>
+            <h2>
+                {mode === 'Ping'
+                    ? `${Math.floor(pingTime / 60000)
+                          .toString()
+                          .padStart(2, '0')}:${(Math.floor(pingTime / 1000) % 60)
+                          .toString()
+                          .padStart(2, '0')}`
+                    : `${Math.floor(timeLeft / 60000)
+                          .toString()
+                          .padStart(2, '0')}:${(Math.floor(timeLeft / 1000) % 60)
+                          .toString()
+                          .padStart(2, '0')}`}
+            </h2>
+            {mode === 'Ping' && <h3>Ping-Zähler: {pingCount}</h3>}
+
+            <label>
+                Modus auswählen:
+                <select value={mode} onChange={(e) => handleModeChange(e.target.value)}>
+                    <option value="Pomodoro">Pomodoro</option>
+                    <option value="Ping">Ping</option>
+                    <option value="Timer">Timer</option>
+                </select>
+            </label>
+
+            <label>
+                Kategorie auswählen:
+                <select
+                    value={selectedCategory || ''}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                    <option value="">Keine Kategorie</option>
+                    {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
+            </label>
+
+            {mode === 'Pomodoro' && (
+                <>
+                    <label>
+                        Fokuszeit:
+                        <input
+                            type="number"
+                            value={focusTime / 60000}
+                            onChange={(e) => setFocusTime(parseInt(e.target.value, 10) * 60000)}
+                        />
+                    </label>
+                    <label>
+                        Pausenzeit:
+                        <input
+                            type="number"
+                            value={pauseTime / 60000}
+                            onChange={(e) => setPauseTime(parseInt(e.target.value, 10) * 60000)}
+                        />
+                    </label>
+                </>
+            )}
+            {mode === 'Ping' && (
+                <label>
+                    Ping-Intervall (Sekunden):
+                    <input
+                        type="number"
+                        value={pingInterval / 1000}
+                        onChange={(e) => setPingInterval(parseInt(e.target.value, 10) * 1000)}
+                    />
+                </label>
+            )}
+            {mode === 'Timer' && (
+                <label>
+                    Zeit (Minuten):
+                    <input
+                        type="number"
+                        value={freeTime / 60000}
+                        onChange={(e) => setFreeTime(parseInt(e.target.value, 10) * 60000)}
+                    />
+                </label>
+            )}
+
+            <div>
+                <button onClick={handleStart}>Start</button>
+                <button onClick={handlePause}>Pause</button>
+                <button onClick={handleReset}>Reset</button>
+            </div>
+        </div>
+    );
+};
+
+export default Timer;
+

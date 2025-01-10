@@ -1,0 +1,140 @@
+.buttonFS {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+}
+
+.fullscreen-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #121212;
+    color: #FFFFFF;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0 !important;
+}
+
+.fullscreen-mode .timer-display {
+    font-size: clamp(2rem, 10vw, 7rem) !important;
+    text-align: center;
+}
+
+.fullscreen-mode .displayWrapper {
+    text-align: center;
+}
+
+.hide {
+    display: none;
+}
+
+.displayWrapper {
+    position: relative;
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+.timer-display {
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: clamp(2rem, 10vw, 12rem);
+    color: #FFFFFF;
+}
+
+/* Styling für die gesamte Eingabemaske */
+.html-duration-picker-input-controls-wrapper {
+    position: relative;
+    display: inline-block;
+    background: transparent;
+}
+
+/* Styling für die Auf-/Ab-Buttons */
+.html-duration-picker-input-controls-wrapper .scroll-btn {
+    background-color: #BB86FC;
+    /* Deine Akzentfarbe */
+    border: none;
+    color: #FFFFFF;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 2px 2px;
+    border-radius: 3px;
+    cursor: pointer;
+    position: absolute;
+    left: .55em;
+}
+
+.html-duration-picker-input-controls-wrapper .controls {
+    top: 15.5px !important;
+}
+
+.html-duration-picker-input-controls-wrapper .scroll-btn:focus {
+    outline: none;
+    box-shadow: 0 0 4px #BB86FC;
+}
+
+/* Styling für die Pfeile */
+.html-duration-picker-input-controls-wrapper .caret {
+    border-color: transparent transparent #FFFFFF transparent;
+    border-width: 0 4px 5px 4px;
+    border-style: solid;
+    display: block;
+    margin: 0 auto;
+    width: 0;
+    height: 0;
+}
+
+/* Styling für den nach unten gerichteten Pfeil */
+.html-duration-picker-input-controls-wrapper .caret.caret-down {
+    border-color: #FFFFFF transparent transparent transparent;
+}
+
+/* Buttons anpassen: Position */
+.html-duration-picker-input-controls-wrapper .controls {
+    position: absolute;
+    right: -28px;
+    /* Abstand rechts vom Eingabefeld */
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Reduziere die Größe der Buttons bei kleineren Bildschirmen */
+@media (max-width: 768px) {
+    .html-duration-picker-input-controls-wrapper .scroll-btn {
+        width: 16px;
+        height: 16px;
+    }
+
+    .html-duration-picker-input-controls-wrapper .caret {
+        border-width: 0 3px 4px 3px;
+    }
+}
+
+
+.html-duration-picker-input-controls-wrapper {
+    margin-left: 1em !important;
+    width: 7em !important;
+}
+
+.html-duration-picker {
+    text-align: center !important;
+    margin: 0 0 0 0 !important;
+    width: 4.8em !important;
+    padding: 4px !important;
+}
+
+.html-duration-picker-input-controls-wrapper .scroll-btn[aria-label="Increase duration"] {
+    top: -1.5px!important;
+}
+
+.controls {
+    display: none !important;
+}
