@@ -106,8 +106,6 @@ function Categories() {
 
 
   const handleOpenMenu = (node) => {
-    console.log('Öffne Bearbeitungsmenü für Node:', node);
-
     setEditNodeId(node.id);
     setTempName(node.name);
     setTempColor(node.color || '#000000');

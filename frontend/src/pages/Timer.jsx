@@ -101,6 +101,8 @@ const Timer = () => {
   const prevCategoryRef = useRef(null);
   const prevModeRef = useRef(null);
   const [globalSettings, setGlobalSettings] = useState({});
+  const [rawCategories, setRawCategories] = useState([]);
+
 
   const loadUserSettings = async () => {
     try {
@@ -203,6 +205,7 @@ const Timer = () => {
       try {
         const response = await API.get('/categories');
         const cats = response.data || [];
+        setRawCategories(cats);
         const flattened = buildHierarchyAndFlatten(cats);
         setCategories(flattened);
       } catch (error) {
@@ -252,7 +255,7 @@ const Timer = () => {
     if (!selectedCategory || categories.length === 0) return;
 
     const catId = parseInt(selectedCategory, 10);
-    const cat = categories.find(c => c.id === catId) || {};
+    const cat = rawCategories.find(c => c.id === catId) || {};
 
     const globalPomodoroFocus = parseInt(globalSettings.timer_pomodoro_focus, 10) || DEFAULT_TIMES[MODES.POMODORO].focus;
     const globalPomodoroPause = parseInt(globalSettings.timer_pomodoro_pause, 10) || DEFAULT_TIMES[MODES.POMODORO].pause;
@@ -269,10 +272,14 @@ const Timer = () => {
     if (!isRunning) {
       if (mode === MODES.POMODORO) {
         setTimeLeft(cat.pomodoro_focus_setting != null ? cat.pomodoro_focus_setting : globalPomodoroFocus);
+        setFocusInput(formatTime(cat.pomodoro_focus_setting != null ? cat.pomodoro_focus_setting : globalPomodoroFocus));
+        setPauseInput(formatTime(cat.pomodoro_pause_setting != null ? cat.pomodoro_pause_setting : globalPomodoroPause));
       } else if (mode === MODES.PING) {
         setTimeLeft(cat.ping_interval_setting != null ? cat.ping_interval_setting : globalPingInterval);
+        setPingInput(formatTime(cat.ping_interval_setting != null ? cat.ping_interval_setting : globalPingInterval));
       } else if (mode === MODES.TIMER) {
         setTimeLeft(cat.timer_time_setting != null ? cat.timer_time_setting : globalTimerDuration);
+        setTimerInput(formatTime(cat.timer_time_setting != null ? cat.timer_time_setting : globalTimerDuration));
       } else if (mode === MODES.CHRONOGRAPH) {
         setTimeLeft(0);
       }
