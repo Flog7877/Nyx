@@ -2,12 +2,15 @@
 
 **Priorität:**
 - [ ] Design-Anpassung insgesamt
+- [ ] Input-Felder überarbeiten (insbesondere bei den Statistiken), generell Popups 
+- [ ] Handy-Modus hinzufügen!!!!!
+- [ ] Wie kann ich das lösen, dass der Timer auch im Hintergrund läuft? 
+- [ ] `SetSaveFeedback` als Notification ähnlich zum Notice-Constructor in Obsidian
 - [ ] Notification-Modus (Windows) 
 - [ ] Kategorie-Seite überarbeiten:
     - [ ] Standart-Werte pro Kategorie 
     - [ ] Error hinzufügen: Wenn Kategorie, die zu einer Session gehört, dann nicht löschbar.
     - [ ] andere Darstellung
-- [ ] Input-Felder überarbeiten (insbesondere bei den Statistiken) 
 - [ ] Bei den Statistiken: 
     - [ ] Verschiedene Ansicht (auch Tabelle) hinzufügen 
     - [ ] "Richtiges" Filtern, also ober-Kategorien beachten. 
