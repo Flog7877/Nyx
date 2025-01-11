@@ -29,3 +29,8 @@
 **Silly Ideen:** 
 - [ ] Daily-Quests hinzufügen
 - [ ] Belohnungssystem
+
+___
+
+**Gedanken:**
+- [ ] Die Auswahl-Boxen mal schön Designen 
