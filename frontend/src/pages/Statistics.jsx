@@ -56,6 +56,42 @@ function buildHierarchyAndFlatten(catArray) {
   return result;
 }
 
+function buildHierarchyAndFlattenWithAncestors(catArray) {
+  const map = {};
+  catArray.forEach((c) => {
+    map[c.id] = { ...c, children: [] };
+  });
+  const rootNodes = [];
+  catArray.forEach((c) => {
+    if (!c.parent_id) {
+      rootNodes.push(map[c.id]);
+    } else {
+      map[c.parent_id].children.push(map[c.id]);
+    }
+  });
+
+  function sortChildren(node) {
+    node.children.sort((a, b) => a.name.localeCompare(b.name));
+    node.children.forEach(sortChildren);
+  }
+  rootNodes.sort((a, b) => a.name.localeCompare(b.name));
+  rootNodes.forEach(sortChildren);
+
+  const result = [];
+  function traverse(node, prefix, ancestors) {
+    const path = prefix ? prefix + '/' + node.name : node.name;
+    result.push({
+      id: node.id,
+      slashPath: path,
+      ancestors: ancestors.concat(node.id)
+    });
+    node.children.forEach((child) => traverse(child, path, ancestors.concat(node.id)));
+  }
+  rootNodes.forEach((r) => traverse(r, '', []));
+  return result;
+}
+
+
 function RoundRow({ runde, onCommentUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedComment, setEditedComment] = useState(runde.comment || '');
@@ -272,10 +308,9 @@ function Statistics() {
   const [editCategory, setEditCategory] = useState('');
   const [editNote, setEditNote] = useState('');
   const [message, setMessage] = useState('');
-
-  const [showRoundsModal, setShowRoundsModal] = useState(false);
   const [modalRounds, setModalRounds] = useState([]);
   const [modalSessionId, setModalSessionId] = useState(null);
+  const [categoryMap, setCategoryMap] = useState({});
 
   useEffect(() => {
     loadSessions();
@@ -295,14 +330,21 @@ function Statistics() {
     }
   };
 
+
   const loadCategories = async () => {
     try {
       const resp = await API.get('/categories');
       const cats = resp.data || [];
-      const flattened = buildHierarchyAndFlatten(cats);
+      const flattened = buildHierarchyAndFlattenWithAncestors(cats);
       setCategories(flattened);
 
-      const allIds = flattened.map(c => c.id);
+      const map = {};
+      flattened.forEach((cat) => {
+        map[cat.id] = cat;
+      });
+      setCategoryMap(map);
+
+      const allIds = flattened.map((c) => c.id);
       allIds.push(-1);
       setSelectedCategoryIds(allIds);
     } catch (err) {
@@ -331,8 +373,11 @@ function Statistics() {
     if (s.category_id == null) {
       return selectedCategoryIds.includes(-1);
     }
-    return selectedCategoryIds.includes(s.category_id);
+    const cat = categoryMap[s.category_id];
+    if (!cat) return false;
+    return cat.ancestors.some(id => selectedCategoryIds.includes(id));
   });
+
 
   const toggleSessionOpen = (sessionId) => {
     setOpenSessionIds(prev => ({
