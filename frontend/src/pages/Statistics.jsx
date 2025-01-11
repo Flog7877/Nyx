@@ -5,7 +5,8 @@ import { useAuthGuard } from '../utils/auth';
 import {
   EditIcon,
   DropDownRightIcon,
-  DropDownDownIcon
+  DropDownDownIcon,
+  FilterIcon
 } from '../assets/icons/icons';
 
 function formatTime(sec) {
@@ -169,7 +170,7 @@ function CategoryCheckboxDropdown({
 
   return (
     <div className="category-dropdown">
-      <button onClick={toggleDropdown}>Kategorien filtern</button>
+      <button style={{ padding: '3px' }} onClick={toggleDropdown}><FilterIcon width="20px" style={{ verticalAlign: '-4px' }} /></button> &nbsp; Nach Kategorie filtern 
       {open && (
         <div className="category-dropdown-content">
           <div className="dropdown-actions">
@@ -227,8 +228,6 @@ function SessionListItem({
     } catch (e) { console.error('Fehler: ', e) }
   }
 
-  console.log('Die Daten: ', data)
-
   const isChrono = session.modus === 'Chronograph';
   const rounds = isChrono && data?.rounds ? data.rounds : [];
   const cat = categoryMap ? categoryMap[session.category_id] : {};
@@ -260,6 +259,7 @@ function SessionListItem({
 
       {isOpen && (
         <div className="session-details">
+          <p>Modus: {session.modus}</p>
           <p>Beginn: {session.start_time ? formatDateTime(session.start_time) : '-'}</p>
           <p>Ende: {session.created_at ? formatDateTime(session.created_at) : '-'}</p>
           <p>Kategorie: {fullPath}</p>
@@ -443,6 +443,33 @@ function Statistics() {
     }
   };
 
+  const convertDate = (sessiondate) => {
+    const date = new Date(sessiondate);
+    const days = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+    let months = date.getMonth() + 1 < 10 ? `0${date.getMonth()+1}` : date.getMonth() + 1; 
+    if (date.getMonth() > 11) {
+      months = `01`;
+    }
+    return `${days}.${months}.${date.getFullYear()}`;
+  }
+
+  function groupSessionsByDate(sessions) {
+    const groups = {};
+    sessions.forEach(session => {
+      const dateKey = session.start_time
+        ? new Date(session.start_time).toLocaleDateString('de-DE')
+        : 'Unbekanntes Datum';
+
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(session);
+    });
+    return groups;
+  }
+
+  const groupedSessions = groupSessionsByDate(filteredSessions);
+
   return (
     <div className="statistics-container">
       <h1>Statistiken</h1>
@@ -455,20 +482,25 @@ function Statistics() {
       />
 
       <ul className="session-list">
-        {filteredSessions.map(session => {
-          const isOpen = !!openSessionIds[session.id];
-          return (
-            <SessionListItem
-              key={session.id}
-              session={session}
-              isOpen={isOpen}
-              toggleOpen={() => toggleSessionOpen(session.id)}
-              onEditClick={() => openEditModal(session)}
-              onRoundCommentUpdate={handleRoundCommentUpdate}
-              categoryMap={categoryMap}
-            />
-          );
-        })}
+        {Object.keys(groupedSessions).sort((a, b) => new Date(b) - new Date(a)).map(date => (
+          <React.Fragment key={date}>
+            <h2>{date}</h2>  {/* Datum als Überschrift */}
+            {groupedSessions[date].map(session => {
+              const isOpen = !!openSessionIds[session.id];
+              return (
+                <SessionListItem
+                  key={session.id}
+                  session={session}
+                  isOpen={isOpen}
+                  toggleOpen={() => toggleSessionOpen(session.id)}
+                  onEditClick={() => openEditModal(session)}
+                  onRoundCommentUpdate={handleRoundCommentUpdate}
+                  categoryMap={categoryMap}
+                />
+              );
+            })}
+          </React.Fragment>
+        ))}
       </ul>
 
       {editId && (

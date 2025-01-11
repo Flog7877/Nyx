@@ -21,3 +21,4 @@ export { default as WarningIcon } from "./WarningIcon";
 export { default as EditIcon } from "./EditIcon";
 export { default as DropDownRightIcon } from "./DropDownRightIcon";
 export { default as DropDownDownIcon } from "./DropDownDownIcon";
+export { default as FilterIcon } from "./FilterIcon";
