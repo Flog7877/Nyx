@@ -1,6 +1,7 @@
 # TODO
 
 **Priorität:**
+- [ ] Design-Anpassung insgesamt
 - [ ] Notification-Modus (Windows) 
 - [ ] Kategorie-Seite überarbeiten:
     - [ ] Standart-Werte pro Kategorie 
