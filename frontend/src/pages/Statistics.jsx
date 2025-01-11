@@ -457,7 +457,8 @@ function Statistics() {
     const groups = {};
     sessions.forEach(session => {
       const dateKey = session.start_time
-        ? new Date(session.start_time).toLocaleDateString('de-DE')
+        //? new Date(session.start_time).toLocaleDateString('de-DE')
+        ? convertDate(session.start_time)
         : 'Unbekanntes Datum';
 
       if (!groups[dateKey]) {
@@ -484,7 +485,7 @@ function Statistics() {
       <ul className="session-list">
         {Object.keys(groupedSessions).sort((a, b) => new Date(b) - new Date(a)).map(date => (
           <React.Fragment key={date}>
-            <h2>{date}</h2>  {/* Datum als Überschrift */}
+            <h2>{date}</h2> 
             {groupedSessions[date].map(session => {
               const isOpen = !!openSessionIds[session.id];
               return (
