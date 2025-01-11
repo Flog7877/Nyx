@@ -170,7 +170,7 @@ function CategoryCheckboxDropdown({
 
   return (
     <div className="category-dropdown">
-      <button style={{ padding: '3px' }} onClick={toggleDropdown}><FilterIcon width="20px" style={{ verticalAlign: '-4px' }} /></button> &nbsp; Nach Kategorie filtern 
+      <button style={{ padding: '3px' }} onClick={toggleDropdown}><FilterIcon width="20px" style={{ verticalAlign: '-4px' }} /></button> &nbsp; Nach Kategorie filtern
       {open && (
         <div className="category-dropdown-content">
           <div className="dropdown-actions">
@@ -211,6 +211,21 @@ function CategoryCheckboxDropdown({
   );
 }
 
+function getContrastingColor(hexColor) {
+  let color = hexColor.replace('#', '');
+  if (color.length === 3) {
+    color = color.split('').map(c => c + c).join('');
+  }
+  const r = parseInt(color.substr(0, 2), 16);
+  const g = parseInt(color.substr(2, 2), 16);
+  const b = parseInt(color.substr(4, 2), 16);
+
+  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+
+  return luminance > 0.5 ? '#000000' : '#FFFFFF';
+}
+
+
 function SessionListItem({
   session,
   onEditClick,
@@ -247,7 +262,10 @@ function SessionListItem({
         <div className="header-right">
           <span
             className="session-category"
-            style={{ backgroundColor: categoryColor }}
+            style={{
+              backgroundColor: categoryColor,
+              color: getContrastingColor(categoryColor)
+            }}
           >
             {categoryName}
           </span>
@@ -446,7 +464,7 @@ function Statistics() {
   const convertDate = (sessiondate) => {
     const date = new Date(sessiondate);
     const days = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
-    let months = date.getMonth() + 1 < 10 ? `0${date.getMonth()+1}` : date.getMonth() + 1; 
+    let months = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
     if (date.getMonth() > 11) {
       months = `01`;
     }
@@ -457,7 +475,6 @@ function Statistics() {
     const groups = {};
     sessions.forEach(session => {
       const dateKey = session.start_time
-        //? new Date(session.start_time).toLocaleDateString('de-DE')
         ? convertDate(session.start_time)
         : 'Unbekanntes Datum';
 
@@ -485,7 +502,7 @@ function Statistics() {
       <ul className="session-list">
         {Object.keys(groupedSessions).sort((a, b) => new Date(b) - new Date(a)).map(date => (
           <React.Fragment key={date}>
-            <h2>{date}</h2> 
+            <h2>{date}</h2>
             {groupedSessions[date].map(session => {
               const isOpen = !!openSessionIds[session.id];
               return (
