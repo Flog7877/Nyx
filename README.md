@@ -34,3 +34,10 @@ ___
 
 **Gedanken:**
 - [ ] Die Auswahl-Boxen mal schön Designen 
+
+**Changelog:** 
+
+Statistiken:
+- Darstellung aktualisiert, die Liste ist jetzt übersichtlicher.
+- Filtersystem funktioniert nun richtig (sortiert man nach einer Kategorie, werden auch alle Unterkategorien angezeigt).
+- Die Statistik einer einzelnen Sitzung zeigt jetzt auch den Modus. 

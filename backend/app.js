@@ -70,7 +70,7 @@ const editSession = require('./routes/editSession');
 const deleteSession = require('./routes/deleteSession');
 const updateRoundComment = require('./routes/updateRoundComment');
 const supportRouter = require('./routes/support');
-
+const getCategorySettings = require('./routes/getCategorySettings');
 // ----------------------------------------------------------------------------
 
 app.post('/api/register', register);
@@ -110,6 +110,8 @@ app.post('/api/categories', verifyToken, checkVerified, addCategory);
 app.put('/api/categories/:id', verifyToken, checkVerified, editCategory);
 
 app.delete('/api/categories/:id', verifyToken, checkVerified, deleteCategory);
+
+app.get('/api/user_settings', verifyToken, checkVerified, getCategorySettings);
 
 app.post('/api/sessions', verifyToken, checkVerified, saveSession);
 

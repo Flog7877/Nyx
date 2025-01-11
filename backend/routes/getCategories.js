@@ -11,7 +11,7 @@ async function getCategories(req, res) {
     let results;
     
     try {
-        const query = `SELECT id, name, parent_id, color FROM categories WHERE user_id=? ORDER BY name`;
+        const query = `SELECT id, name, parent_id, color, pomodoro_focus_setting, pomodoro_pause_setting, ping_interval_setting, timer_time_setting FROM categories WHERE user_id=? ORDER BY name`;
         const SQLquery = await db.query(query, [userId]);
         results = SQLquery[0];
     } catch (err) {

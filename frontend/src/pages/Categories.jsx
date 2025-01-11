@@ -29,6 +29,27 @@ function buildTree(catArray) {
   return rootNodes;
 }
 
+function timeStringToSeconds(timeStr) {
+  const parts = timeStr.split(':').map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return 0;
+  return parts[0] * 3600 + parts[1] * 60 + parts[2];
+}
+
+function formatTime(sec) {
+  if (typeof sec === 'string') {
+    sec = timeStringToSeconds(sec);
+  }
+  if (sec == null || isNaN(sec)) {
+    return '00:00:00';
+  }
+  const hrs = String(Math.floor(sec / 3600)).padStart(2, '0');
+  const mins = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+  const secs = String(sec % 60).padStart(2, '0');
+  return `${hrs}:${mins}:${secs}`;
+}
+
+
+
 function Categories() {
   useAuthGuard();
   const navigate = useNavigate();
@@ -39,12 +60,13 @@ function Categories() {
   const [tempName, setTempName] = useState('');
   const [tempColor, setTempColor] = useState('#000000');
   const [expandedNodes, setExpandedNodes] = useState(new Set());
-  
-  
 
-  useEffect(() => {
-    loadCategories();
-  }, []);
+  const [globalSettings, setGlobalSettings] = useState({});
+
+  const [tempPomodoroFocus, setTempPomodoroFocus] = useState('00:25:00');
+  const [tempPomodoroPause, setTempPomodoroPause] = useState('00:05:00');
+  const [tempPingInterval, setTempPingInterval] = useState('00:15:00');
+  const [tempTimerTime, setTempTimerTime] = useState('00:10:00');
 
   const loadCategories = async () => {
     try {
@@ -53,7 +75,7 @@ function Categories() {
       setCategories(fetchedCats);
 
       const allIds = fetchedCats.map((cat) => cat.id);
-      setExpandedNodes(new Set(allIds)); 
+      setExpandedNodes(new Set(allIds));
     } catch (err) {
       if (err.response && err.response.status === 401) {
         navigate('/login');
@@ -63,21 +85,84 @@ function Categories() {
     }
   };
 
-  const handleOpenMenu = (node) => {
-    setEditNodeId(node.id);
-    setTempName(node.name);            
-    setTempColor(node.color || '#000000'); 
+  const loadUserSettings = async () => {
+    try {
+      const resp = await API.get('/user_settings');
+      const settingsArray = resp.data || [];
+      const settingsObj = {};
+      settingsArray.forEach(setting => {
+        settingsObj[setting.setting_key] = setting.setting_value;
+      });
+      setGlobalSettings(settingsObj);
+    } catch (err) {
+      console.error('Fehler beim Laden der Benutzereinstellungen:', err);
+    }
   };
+
+  useEffect(() => {
+    loadCategories();
+    loadUserSettings()
+  }, []);
+
+
+  const handleOpenMenu = (node) => {
+    console.log('Öffne Bearbeitungsmenü für Node:', node);
+
+    setEditNodeId(node.id);
+    setTempName(node.name);
+    setTempColor(node.color || '#000000');
+
+    const globalPomodoroFocus = parseInt(globalSettings.timer_pomodoro_focus, 10);
+    setTempPomodoroFocus(
+      node.pomodoro_focus_setting != null
+        ? formatTime(node.pomodoro_focus_setting)
+        : !isNaN(globalPomodoroFocus)
+          ? formatTime(globalPomodoroFocus)
+          : '00:25:00'
+    );
+
+    const globalPomodoroPause = parseInt(globalSettings.timer_pomodoro_pause, 10);
+    setTempPomodoroPause(
+      node.pomodoro_pause_setting != null
+        ? formatTime(node.pomodoro_pause_setting)
+        : !isNaN(globalPomodoroPause)
+          ? formatTime(globalPomodoroPause)
+          : '00:05:00'
+    );
+
+    const globalPingInterval = parseInt(globalSettings.timer_ping_interval, 10);
+    setTempPingInterval(
+      node.ping_interval_setting != null
+        ? formatTime(node.ping_interval_setting)
+        : !isNaN(globalPingInterval)
+          ? formatTime(globalPingInterval)
+          : '00:15:00'
+    );
+
+    const globalTimerDuration = parseInt(globalSettings.timer_timer_duration, 10);
+    setTempTimerTime(
+      node.timer_time_setting != null
+        ? formatTime(node.timer_time_setting)
+        : !isNaN(globalTimerDuration)
+          ? formatTime(globalTimerDuration)
+          : '00:10:00'
+    );
+  };
+
 
   const handleCancelEdit = () => {
     setEditNodeId(null);
   };
-  
+
   const handleSaveEdit = async (nodeId) => {
     try {
       await API.put(`/categories/${nodeId}`, {
         name: tempName,
-        color: tempColor
+        color: tempColor,
+        pomodoro_focus_setting: timeStringToSeconds(tempPomodoroFocus),
+        pomodoro_pause_setting: timeStringToSeconds(tempPomodoroPause),
+        ping_interval_setting: timeStringToSeconds(tempPingInterval),
+        timer_time_setting: timeStringToSeconds(tempTimerTime)
       });
       setEditNodeId(null);
       loadCategories();
@@ -86,14 +171,14 @@ function Categories() {
       alert(err.response?.data?.error || 'Fehler beim Speichern');
     }
   };
-  
+
 
   const handleAddCategory = async () => {
     if (!slashPath.trim()) return;
     try {
       await API.post('/categories', {
         slashPath,
-        color, 
+        color,
       });
       setSlashPath('');
       loadCategories();
@@ -124,18 +209,18 @@ function Categories() {
       alert(err.response?.data?.error || 'Fehler beim Löschen');
     }
   };
-  
 
-  const renderNode = (node, level=0) => {
+
+  const renderNode = (node, level = 0) => {
     const isExpanded = expandedNodes.has(node.id);
     const hasChildren = node.children.length > 0;
     const isEditing = (editNodeId === node.id);
-  
+
     return (
       <div key={node.id} style={{ marginLeft: level * 20 }}>
         <span
           onClick={() => toggleNode(node.id)}
-          style={{ 
+          style={{
             cursor: hasChildren ? 'pointer' : 'default',
             color: node.color
           }}
@@ -164,7 +249,7 @@ function Categories() {
                 />
               </label>
             </div>
-  
+
             <div style={{ marginBottom: '6px' }}>
               <label>
                 Farbe:
@@ -176,7 +261,55 @@ function Categories() {
                 />
               </label>
             </div>
-  
+
+            <div style={{ marginBottom: '6px' }}>
+              <label>
+                Fokuszeit (hh:mm:ss):
+                <input
+                  type="text"
+                  style={{ marginLeft: '8px' }}
+                  value={tempPomodoroFocus}
+                  onChange={(e) => setTempPomodoroFocus(e.target.value)}
+                />
+              </label>
+            </div>
+
+            <div style={{ marginBottom: '6px' }}>
+              <label>
+                Pausenzeit (hh:mm:ss):
+                <input
+                  type="text"
+                  style={{ marginLeft: '8px' }}
+                  value={tempPomodoroPause}
+                  onChange={(e) => setTempPomodoroPause(e.target.value)}
+                />
+              </label>
+            </div>
+
+            <div style={{ marginBottom: '6px' }}>
+              <label>
+                Ping-Intervall (hh:mm:ss):
+                <input
+                  type="text"
+                  style={{ marginLeft: '8px' }}
+                  value={tempPingInterval}
+                  onChange={(e) => setTempPingInterval(e.target.value)}
+                />
+              </label>
+            </div>
+
+            <div style={{ marginBottom: '6px' }}>
+              <label>
+                Timer-Dauer (hh:mm:ss):
+                <input
+                  type="text"
+                  style={{ marginLeft: '8px' }}
+                  value={tempTimerTime}
+                  onChange={(e) => setTempTimerTime(e.target.value)}
+                />
+              </label>
+            </div>
+
             <button onClick={() => handleSaveEdit(node.id)}>
               Bestätigen
             </button>
@@ -184,8 +317,8 @@ function Categories() {
               Abbrechen
             </button>
             <br />
-  
-            <button 
+
+            <button
               onClick={() => handleDeleteNode(node.id)}
               style={{ marginTop: '8px', color: 'red' }}
             >
@@ -193,12 +326,12 @@ function Categories() {
             </button>
           </div>
         )}
-        {isExpanded && node.children.map(child => renderNode(child, level+1))}
+        {isExpanded && node.children.map(child => renderNode(child, level + 1))}
       </div>
     );
   };
-  
-  
+
+
 
   const tree = buildTree(categories);
 
@@ -216,9 +349,9 @@ function Categories() {
             onChange={(e) => setSlashPath(e.target.value)}
           />
         </label>
-        <p style = {{ textAlign: 'justify', textJustify: 'inter-word' }}>
-          Kategorien haben eine hierarchische Struktur, d.h. man kann beliebig viele Unterkategorien erstellen. 
-          Dabei trennt man die Kategorien mit "/". Zum Beispiel ist bei Uni/Mathe/Analysis die oberste Kategorie "Uni", deren Subkategorie ist "Mathe" und deren Subkategorie ist wiederum "Analysis" und so weiter. 
+        <p style={{ textAlign: 'justify', textJustify: 'inter-word' }}>
+          Kategorien haben eine hierarchische Struktur, d.h. man kann beliebig viele Unterkategorien erstellen.
+          Dabei trennt man die Kategorien mit "/". Zum Beispiel ist bei Uni/Mathe/Analysis die oberste Kategorie "Uni", deren Subkategorie ist "Mathe" und deren Subkategorie ist wiederum "Analysis" und so weiter.
           Erstellt man eine Kategorie, deren Parents noch nicht existeiren, werden diese automatisch erstellt und erhalten die Farbe manuell erstellten Childs.
         </p>
       </div>

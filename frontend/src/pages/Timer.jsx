@@ -98,6 +98,23 @@ const Timer = () => {
   const [editingRoundNr, setEditingRoundNr] = useState(null);
   const [editingComment, setEditingComment] = useState('');
 
+  const prevCategoryRef = useRef(null);
+  const prevModeRef = useRef(null);
+  const [globalSettings, setGlobalSettings] = useState({});
+
+  const loadUserSettings = async () => {
+    try {
+      const resp = await API.get('/user_settings');
+      const settingsArray = resp.data || [];
+      const settingsObj = {};
+      settingsArray.forEach(setting => {
+        settingsObj[setting.setting_key] = setting.setting_value;
+      });
+      setGlobalSettings(settingsObj);
+    } catch (err) {
+      console.error('Fehler beim Laden der Benutzereinstellungen:', err);
+    }
+  };
 
   useEffect(() => {
     if (!workerRef.current) {
@@ -224,8 +241,45 @@ const Timer = () => {
   const timeSettingsRef = useRef(timeSettings);
 
   useEffect(() => {
+    loadUserSettings();
+  }, []);
+
+  useEffect(() => {
     timeSettingsRef.current = timeSettings;
   }, [timeSettings]);
+
+  useEffect(() => {
+    if (!selectedCategory || categories.length === 0) return;
+
+    const catId = parseInt(selectedCategory, 10);
+    const cat = categories.find(c => c.id === catId) || {};
+
+    const globalPomodoroFocus = parseInt(globalSettings.timer_pomodoro_focus, 10) || DEFAULT_TIMES[MODES.POMODORO].focus;
+    const globalPomodoroPause = parseInt(globalSettings.timer_pomodoro_pause, 10) || DEFAULT_TIMES[MODES.POMODORO].pause;
+    const globalPingInterval = parseInt(globalSettings.timer_ping_interval, 10) || DEFAULT_TIMES[MODES.PING].interval;
+    const globalTimerDuration = parseInt(globalSettings.timer_timer_duration, 10) || DEFAULT_TIMES[MODES.TIMER].duration;
+
+    setTimeSettings({
+      focus: cat.pomodoro_focus_setting != null ? cat.pomodoro_focus_setting : globalPomodoroFocus,
+      pause: cat.pomodoro_pause_setting != null ? cat.pomodoro_pause_setting : globalPomodoroPause,
+      interval: cat.ping_interval_setting != null ? cat.ping_interval_setting : globalPingInterval,
+      duration: cat.timer_time_setting != null ? cat.timer_time_setting : globalTimerDuration,
+    });
+
+    if (!isRunning) {
+      if (mode === MODES.POMODORO) {
+        setTimeLeft(cat.pomodoro_focus_setting != null ? cat.pomodoro_focus_setting : globalPomodoroFocus);
+      } else if (mode === MODES.PING) {
+        setTimeLeft(cat.ping_interval_setting != null ? cat.ping_interval_setting : globalPingInterval);
+      } else if (mode === MODES.TIMER) {
+        setTimeLeft(cat.timer_time_setting != null ? cat.timer_time_setting : globalTimerDuration);
+      } else if (mode === MODES.CHRONOGRAPH) {
+        setTimeLeft(0);
+      }
+    }
+  }, [selectedCategory, mode, categories, globalSettings]);
+
+
 
 
   useEffect(() => {
@@ -911,7 +965,7 @@ const Timer = () => {
         <div style={{ marginTop: '10px' }}>
           <br></br>
           <div>
-            <button onClick={handleNewRound}>Runde setzen</button>
+            <button onClick={handleNewRound} disabled={!isRunning}>Runde setzen</button>
             <input
               type="text"
               placeholder="Kommentar..."
@@ -978,7 +1032,7 @@ const Timer = () => {
           <p><strong>Fokuszeit:</strong> {formatTime(elapsedFocusTime)}</p>
           <p><strong>Pausenzeit:</strong> {formatTime(elapsedPauseTime)}</p>
           <button onClick={clearElapsedTimes} style={{ marginTop: '2px' }}>
-          <DeleteIcon width='18px' style={{ verticalAlign: '-3px' }} /> Clear Session
+            <DeleteIcon width='18px' style={{ verticalAlign: '-3px' }} /> Clear Session
           </button>
         </div>
       )}

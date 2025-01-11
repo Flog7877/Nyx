@@ -1,14 +1,5 @@
-const dotenv = require('dotenv');
-const express = require('express');
 const db = require('../config/db');
-const mailer = require('../config/mail');
-const crypto = require('crypto');
-const cors = require('cors');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const secretKey = require('../app')
-const verifyToken = require('../middleware/auth');
-const checkVerified = require('../middleware/checkVerified');
+
 
 async function editCategory(req, res) {
   const userId = req.user.userId;
@@ -30,6 +21,23 @@ async function editCategory(req, res) {
   }
   if (fields.length === 0) {
     return res.status(400).json({ error: 'Keine gültigen Felder zum Aktualisieren übergeben.' });
+  }
+
+  if (req.body.pomodoro_focus_setting !== undefined) {
+    fields.push('pomodoro_focus_setting=?');
+    values.push(req.body.pomodoro_focus_setting);
+  }
+  if (req.body.pomodoro_pause_setting !== undefined) {
+    fields.push('pomodoro_pause_setting=?');
+    values.push(req.body.pomodoro_pause_setting);
+  }
+  if (req.body.ping_interval_setting !== undefined) {
+    fields.push('ping_interval_setting=?');
+    values.push(req.body.ping_interval_setting);
+  }
+  if (req.body.timer_time_setting !== undefined) {
+    fields.push('timer_time_setting=?');
+    values.push(req.body.timer_time_setting);
   }
 
   let results;
