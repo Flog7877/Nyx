@@ -82,6 +82,8 @@ function buildHierarchyAndFlattenWithAncestors(catArray) {
     const path = prefix ? prefix + '/' + node.name : node.name;
     result.push({
       id: node.id,
+      name: node.name,
+      color: node.color,
       slashPath: path,
       ancestors: ancestors.concat(node.id)
     });
@@ -90,6 +92,7 @@ function buildHierarchyAndFlattenWithAncestors(catArray) {
   rootNodes.forEach((r) => traverse(r, '', []));
   return result;
 }
+
 
 
 function RoundRow({ runde, onCommentUpdate }) {
@@ -212,7 +215,8 @@ function SessionListItem({
   onEditClick,
   isOpen,
   toggleOpen,
-  onRoundCommentUpdate
+  onRoundCommentUpdate,
+  categoryMap
 }) {
   let data = null;
   if (session.extra_data) {
@@ -220,27 +224,45 @@ function SessionListItem({
       data = (typeof session.extra_data === 'string')
         ? JSON.parse(session.extra_data)
         : session.extra_data;
-    } catch (e) {
-    }
+    } catch (e) { console.error('Fehler: ', e) }
   }
+
+  console.log('Die Daten: ', data)
 
   const isChrono = session.modus === 'Chronograph';
   const rounds = isChrono && data?.rounds ? data.rounds : [];
+  const cat = categoryMap ? categoryMap[session.category_id] : {};
+  const categoryColor = cat?.color || '#2C2C2C';
+  const categoryName = cat?.name || 'Keine Kategorie';
+  const fullPath = cat?.slashPath || '-';
 
   return (
     <li className="session-list-item">
       <div className="session-header">
         <button className="expand-btn" onClick={toggleOpen}>
-          {isOpen ? <DropDownDownIcon width="32px" style={{ verticalAlign: '-17px' }} /> : <DropDownRightIcon width="32px" style={{ verticalAlign: '-17px' }} />}
+          {isOpen
+            ? <DropDownDownIcon width="32px" style={{ verticalAlign: '-17px' }} />
+            : <DropDownRightIcon width="32px" style={{ verticalAlign: '-17px' }} />}
         </button>
         <span>Session {session.id}</span>
+        <div className="header-right">
+          <span
+            className="session-category"
+            style={{ backgroundColor: categoryColor }}
+          >
+            {categoryName}
+          </span>
+          <span className="session-totaltime">
+            {formatTime(session.totalTime)}
+          </span>
+        </div>
       </div>
 
       {isOpen && (
         <div className="session-details">
           <p>Beginn: {session.start_time ? formatDateTime(session.start_time) : '-'}</p>
           <p>Ende: {session.created_at ? formatDateTime(session.created_at) : '-'}</p>
-          <p>Kategorie: {session.category_name || 'Keine'}</p>
+          <p>Kategorie: {fullPath}</p>
           {session.modus === 'Pomodoro' && data && (
             <div>
               <p>Runden: {data.rounds || '-'}</p>
@@ -443,6 +465,7 @@ function Statistics() {
               toggleOpen={() => toggleSessionOpen(session.id)}
               onEditClick={() => openEditModal(session)}
               onRoundCommentUpdate={handleRoundCommentUpdate}
+              categoryMap={categoryMap}
             />
           );
         })}
