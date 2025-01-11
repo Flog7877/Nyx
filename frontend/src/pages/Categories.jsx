@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import API from '../api';
 import { useNavigate } from 'react-router-dom';
 import { useAuthGuard } from '../utils/auth';
+import {
+  WrenchIcon
+} from "../assets/icons/icons";
 
 function buildTree(catArray) {
   const map = {};
@@ -226,8 +229,8 @@ function Categories() {
           {hasChildren && (isExpanded ? '▼ ' : '▶ ')}
           {node.name}
         </span>
-        <button style={{ marginLeft: 8 }} onClick={() => handleOpenMenu(node)}>
-          ...
+        <button style={{ marginLeft: 8, padding: '0', background: 'none', verticalAlign: '-5px' }} onClick={() => handleOpenMenu(node)}>
+          <WrenchIcon width="18px" />
         </button>
         {isEditing && (
           <div style={{

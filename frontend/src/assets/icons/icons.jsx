@@ -22,3 +22,4 @@ export { default as EditIcon } from "./EditIcon";
 export { default as DropDownRightIcon } from "./DropDownRightIcon";
 export { default as DropDownDownIcon } from "./DropDownDownIcon";
 export { default as FilterIcon } from "./FilterIcon";
+export { default as WrenchIcon } from "./WrenchIcon";
