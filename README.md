@@ -7,6 +7,10 @@
     - [ ] Error hinzufügen: Wenn Kategorie, die zu einer Session gehört, dann nicht löschbar.
     - [ ] andere Darstellung
 - [ ] Input-Felder überarbeiten (insbesondere bei den Statistiken) 
+- [ ] Bei den Statistiken: 
+    - [ ] Verschiedene Ansicht (auch Tabelle) hinzufügen 
+    - [ ] "Richtiges" Filtern, also ober-Kategorien beachten. 
+- [ ] Seite für silly Sachen (sowas wie Leaderboard), vielleicht 'Misc'?  
 - [ ] Backend Monitoring!!!
 
 **Semi-Wichtig:**
