@@ -5,6 +5,7 @@ import { useAuthGuard } from '../utils/auth';
 import {
   WrenchIcon
 } from "../assets/icons/icons";
+import "../assets/Styles/CategoryStyling.css"
 
 function buildTree(catArray) {
   const map = {};
@@ -51,7 +52,19 @@ function formatTime(sec) {
   return `${hrs}:${mins}:${secs}`;
 }
 
+function getContrastingColor(hexColor) {
+  let color = hexColor.replace('#', '');
+  if (color.length === 3) {
+    color = color.split('').map(c => c + c).join('');
+  }
+  const r = parseInt(color.substr(0, 2), 16);
+  const g = parseInt(color.substr(2, 2), 16);
+  const b = parseInt(color.substr(4, 2), 16);
 
+  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+
+  return luminance > 0.5 ? '#000000' : '#FFFFFF';
+}
 
 function Categories() {
   useAuthGuard();
@@ -212,127 +225,280 @@ function Categories() {
   };
 
 
-  const renderNode = (node, level = 0) => {
-    const isExpanded = expandedNodes.has(node.id);
-    const hasChildren = node.children.length > 0;
+  function renderNode(node) {
     const isEditing = (editNodeId === node.id);
+    const isExpanded = expandedNodes.has(node.id);
+    const hasChildren = node.children && node.children.length > 0;
 
-    return (
-      <div key={node.id} style={{ marginLeft: level * 20 }}>
-        <span
-          onClick={() => toggleNode(node.id)}
-          style={{
-            cursor: hasChildren ? 'pointer' : 'default',
-            color: node.color
-          }}
-        >
-          {hasChildren && (isExpanded ? '▼ ' : '▶ ')}
-          {node.name}
-        </span>
-        <button style={{ marginLeft: 8, padding: '0', background: 'none', verticalAlign: '-5px' }} onClick={() => handleOpenMenu(node)}>
-          <WrenchIcon width="18px" />
-        </button>
-        {isEditing && (
-          <div style={{
-            border: '1px solid #ddd',
-            background: '#333333',
-            padding: '8px',
-            marginTop: '4px'
-          }}>
-            <div style={{ marginBottom: '6px' }}>
-              <label>
-                Name:
-                <input
-                  type="text"
-                  style={{ marginLeft: '8px' }}
-                  value={tempName}
-                  onChange={(e) => setTempName(e.target.value)}
-                />
-              </label>
-            </div>
-
-            <div style={{ marginBottom: '6px' }}>
-              <label>
-                Farbe:
-                <input
-                  type="color"
-                  style={{ marginLeft: '8px' }}
-                  value={tempColor}
-                  onChange={(e) => setTempColor(e.target.value)}
-                />
-              </label>
-            </div>
-
-            <div style={{ marginBottom: '6px' }}>
-              <label>
-                Fokuszeit (hh:mm:ss):
-                <input
-                  type="text"
-                  style={{ marginLeft: '8px' }}
-                  value={tempPomodoroFocus}
-                  onChange={(e) => setTempPomodoroFocus(e.target.value)}
-                />
-              </label>
-            </div>
-
-            <div style={{ marginBottom: '6px' }}>
-              <label>
-                Pausenzeit (hh:mm:ss):
-                <input
-                  type="text"
-                  style={{ marginLeft: '8px' }}
-                  value={tempPomodoroPause}
-                  onChange={(e) => setTempPomodoroPause(e.target.value)}
-                />
-              </label>
-            </div>
-
-            <div style={{ marginBottom: '6px' }}>
-              <label>
-                Ping-Intervall (hh:mm:ss):
-                <input
-                  type="text"
-                  style={{ marginLeft: '8px' }}
-                  value={tempPingInterval}
-                  onChange={(e) => setTempPingInterval(e.target.value)}
-                />
-              </label>
-            </div>
-
-            <div style={{ marginBottom: '6px' }}>
-              <label>
-                Timer-Dauer (hh:mm:ss):
-                <input
-                  type="text"
-                  style={{ marginLeft: '8px' }}
-                  value={tempTimerTime}
-                  onChange={(e) => setTempTimerTime(e.target.value)}
-                />
-              </label>
-            </div>
-
-            <button onClick={() => handleSaveEdit(node.id)}>
-              Bestätigen
-            </button>
-            <button onClick={handleCancelEdit} style={{ marginLeft: '8px' }}>
-              Abbrechen
-            </button>
-            <br />
-
-            <button
-              onClick={() => handleDeleteNode(node.id)}
-              style={{ marginTop: '8px', color: 'red' }}
+    if (hasChildren) {
+      return (
+        <li key={node.id}>
+          <details open={expandedNodes.has(node.id)}>
+            <summary
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleNode(node.id);
+              }}
+              style={{ display: 'inline-flex', alignItems: 'center' }}
             >
-              Löschen
-            </button>
-          </div>
-        )}
-        {isExpanded && node.children.map(child => renderNode(child, level + 1))}
-      </div>
-    );
-  };
+              <span
+                style={{
+                  backgroundColor: node.color,
+                  borderRadius: '5px',
+                  padding: '1px 4px',
+                  color: getContrastingColor(node.color),
+                  marginLeft: '4px',
+                  marginBottom: '6px'
+                }}
+              >
+                {node.name}
+              </span>
+              <button
+                style={{ marginLeft: 8, padding: 0, background: 'none', border: 'none' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenMenu(node);
+                }}
+              >
+                <WrenchIcon width="18px" />
+              </button>
+            </summary>
 
 
+            {isEditing && (
+              <div style={{
+                border: '1px solid #ddd',
+                background: '#333333',
+                padding: '8px',
+                marginTop: '4px'
+              }}>
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Name:
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Farbe:
+                    <input
+                      type="color"
+                      style={{ marginLeft: '8px' }}
+                      value={tempColor}
+                      onChange={(e) => setTempColor(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Fokuszeit (hh:mm:ss):
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempPomodoroFocus}
+                      onChange={(e) => setTempPomodoroFocus(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Pausenzeit (hh:mm:ss):
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempPomodoroPause}
+                      onChange={(e) => setTempPomodoroPause(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Ping-Intervall (hh:mm:ss):
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempPingInterval}
+                      onChange={(e) => setTempPingInterval(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Timer-Dauer (hh:mm:ss):
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempTimerTime}
+                      onChange={(e) => setTempTimerTime(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <button onClick={() => handleSaveEdit(node.id)}>
+                  Bestätigen
+                </button>
+                <button onClick={handleCancelEdit} style={{ marginLeft: '8px' }}>
+                  Abbrechen
+                </button>
+                <br />
+
+                <button
+                  onClick={() => handleDeleteNode(node.id)}
+                  style={{ marginTop: '8px', color: 'red' }}
+                >
+                  Löschen
+                </button>
+              </div>
+            )}
+
+            {node.children && node.children.length > 0 && (
+              <ul>
+                {node.children.map(child => renderNode(child))}
+              </ul>
+            )}
+          </details>
+        </li>
+      );
+    } else {
+      return (
+        <li key={node.id}>
+          <span style={{
+            backgroundColor: node.color,
+            borderRadius: '5px',
+            padding: '2px 8px',
+            color: getContrastingColor(node.color),
+            marginLeft: '4px',
+            marginBottom: '6px'
+          }}>
+            {node.name}
+          </span>
+          <button
+            style={{ marginLeft: 8, padding: 0, background: 'none', border: 'none' }}
+            onClick={() => handleOpenMenu(node)}
+          >
+            <WrenchIcon width="18px" />
+          </button>
+
+
+          {
+            isEditing && (
+              <div style={{
+                border: '1px solid #ddd',
+                background: '#333333',
+                padding: '8px',
+                marginTop: '4px'
+              }}>
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Name:
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Farbe:
+                    <input
+                      type="color"
+                      style={{ marginLeft: '8px' }}
+                      value={tempColor}
+                      onChange={(e) => setTempColor(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Fokuszeit (hh:mm:ss):
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempPomodoroFocus}
+                      onChange={(e) => setTempPomodoroFocus(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Pausenzeit (hh:mm:ss):
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempPomodoroPause}
+                      onChange={(e) => setTempPomodoroPause(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Ping-Intervall (hh:mm:ss):
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempPingInterval}
+                      onChange={(e) => setTempPingInterval(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <label>
+                    Timer-Dauer (hh:mm:ss):
+                    <input
+                      type="text"
+                      style={{ marginLeft: '8px' }}
+                      value={tempTimerTime}
+                      onChange={(e) => setTempTimerTime(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <button onClick={() => handleSaveEdit(node.id)}>
+                  Bestätigen
+                </button>
+                <button onClick={handleCancelEdit} style={{ marginLeft: '8px' }}>
+                  Abbrechen
+                </button>
+                <br />
+
+                <button
+                  onClick={() => handleDeleteNode(node.id)}
+                  style={{ marginTop: '8px', color: 'red' }}
+                >
+                  Löschen
+                </button>
+              </div>
+            )
+          }
+
+          {
+            hasChildren && isExpanded && (
+              <ul>
+                {node.children.map(child => renderNode(child))}
+              </ul>
+            )
+          }
+        </li >
+      );
+    }
+  }
 
   const tree = buildTree(categories);
 
@@ -369,7 +535,9 @@ function Categories() {
       </div>
       <button onClick={handleAddCategory}>Kategorie anlegen</button>
       <h2>Meine Kategorien</h2>
-      {tree.map(root => renderNode(root))}
+      <ul className="tree">
+        {tree.map(root => renderNode(root))}
+      </ul>
     </div>
   );
 }
