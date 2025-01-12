@@ -8,12 +8,10 @@
 - [ ] `SetSaveFeedback` als Notification ähnlich zum Notice-Constructor in Obsidian
 - [ ] Notification-Modus (Windows) 
 - [ ] Kategorie-Seite überarbeiten:
-    - [ ] Standart-Werte pro Kategorie 
     - [ ] Error hinzufügen: Wenn Kategorie, die zu einer Session gehört, dann nicht löschbar.
     - [ ] andere Darstellung
 - [ ] Bei den Statistiken: 
-    - [ ] Verschiedene Ansicht (auch Tabelle) hinzufügen 
-    - [ ] "Richtiges" Filtern, also ober-Kategorien beachten. 
+    - [ ] Verschiedene Ansicht (auch Tabelle) hinzufügen    
 - [ ] Seite für silly Sachen (sowas wie Leaderboard), vielleicht 'Misc'?  
 - [ ] Backend Monitoring!!!
 

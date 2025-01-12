@@ -71,6 +71,9 @@ const deleteSession = require('./routes/deleteSession');
 const updateRoundComment = require('./routes/updateRoundComment');
 const supportRouter = require('./routes/support');
 const getCategorySettings = require('./routes/getCategorySettings');
+const readChangelog = require('./routes/readChangelog');
+const didReadChangelog = require('./routes/didReadChangelog');
+
 // ----------------------------------------------------------------------------
 
 app.post('/api/register', register);
@@ -124,6 +127,10 @@ app.delete('/api/sessions/:id', verifyToken, checkVerified, deleteSession);
 app.post('/api/sessions/:sessionId/rounds/:roundNr', verifyToken, checkVerified, updateRoundComment);
 
 app.post('/api/support', verifyToken, supportRouter);
+
+app.post('/api/changelog/read', verifyToken, checkVerified, readChangelog);
+
+app.get('/api/changelog/status', verifyToken, checkVerified, didReadChangelog);
 
 // --------------------------------------------------------------------------------------
 

@@ -3,7 +3,7 @@ import axios from 'axios';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const API = axios.create({
-    baseURL: API_BASE_URL,
+  baseURL: API_BASE_URL,
 });
 
 let isRefreshing = false;
@@ -29,7 +29,7 @@ API.interceptors.request.use((config) => {
 }, (error) => Promise.reject(error));
 
 API.interceptors.response.use(
-  (response) => response, 
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
@@ -82,7 +82,7 @@ API.interceptors.response.use(
 
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/login'; 
+        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }
@@ -127,63 +127,81 @@ export const validateAccessToken = async () => {
 };
 
 API.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    (error) => {
-      if (
-        error.response && 
-        error.response.status === 403 &&
-        error.response.data?.error === 'not-verified'
-      ) {
-        window.location.href = '/notVerified';
-      }
-      return Promise.reject(error);
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (
+      error.response &&
+      error.response.status === 403 &&
+      error.response.data?.error === 'not-verified'
+    ) {
+      window.location.href = '/notVerified';
     }
-  );
+    return Promise.reject(error);
+  }
+);
 
 export default API;
 
 export const loginUser = async (credentials) => {
-    try {
-        const response = await API.post('/login', credentials);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
-    }
+  try {
+    const response = await API.post('/login', credentials);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
+  }
 };
 
 export const registerUser = async (userData) => {
-    try {
-        const response = await API.post('/register', userData);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
-    }
+  try {
+    const response = await API.post('/register', userData);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
+  }
 };
 
 export const saveSession = async (sessionData) => {
-    try {
-        const response = await API.post('/sessions', sessionData);
-        return response.data;
-    } catch (error) {
-        throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
-    }
+  try {
+    const response = await API.post('/sessions', sessionData);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
+  }
 };
 
 export const resendVerification = async (email) => {
-    try {
-      const resp = await API.post('/resendVerification', { email });
-      return resp.data;
-    } catch (error) {
-      throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
-    }
-  };
+  try {
+    const resp = await API.post('/resendVerification', { email });
+    return resp.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
+  }
+};
 
 
 export const sendSupportMessage = async (payload) => {
   try {
     const response = await API.post('/support', payload);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
+  }
+};
+
+export const markChangelogAsRead = async () => {
+  try {
+    const response = await API.post('/changelog/read');
+    return response.data; 
+  } catch (error) {
+    throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
+  }
+};
+
+export const fetchChangelogStatus = async () => {
+  try {
+    const response = await API.get('/changelog/status');
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
