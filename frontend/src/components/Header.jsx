@@ -4,6 +4,8 @@ import { AuthContext } from '../AuthContext';
 import { UserIcon, SidebarIcon, LoginIcon, LogoutIcon, ToolsIcon } from '../assets/icons/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchChangelogStatus, markChangelogAsRead } from '../api';
+import ChangelogContent from './ChangelogContent';
+
 
 function Header({ onBurgerClick }) {
     const { user, logout, isFullscreen } = useContext(AuthContext);
@@ -16,8 +18,6 @@ function Header({ onBurgerClick }) {
             fetchChangelogStatus(user)
                 .then((data) => {
                     setShowNotification(!data.read)
-                    console.log(data);
-                    console.log(showNotification);
                 })
                 .catch((error) => {
                     console.error('Fehler beim Abrufen des Changelog-Status:', error);
@@ -28,7 +28,6 @@ function Header({ onBurgerClick }) {
 
     const markChangelogAsReadHandler = () => {
         const payload = user;
-        console.log(payload);
         markChangelogAsRead(payload)
             .then(() => {
                 setShowNotification(false);
@@ -106,28 +105,17 @@ function Header({ onBurgerClick }) {
                 <div className="changelog-popup-overlay" onClick={toggleChangelogPopup}>
                     <div
                         className="changelog-popup"
-                        onClick={(e) => e.stopPropagation()} // Verhindert Schließen bei Klick im Popup
+                        onClick={(e) => e.stopPropagation()}
                     >
                         <h1>
                             <ToolsIcon className="changelog-icon" /> Changelog
                         </h1>
-                        <section>
-                            <h4>
-                                <span className="popup-version-badge">v0.1.2</span>
-                            </h4>
-                            <ul className="features">
-                                <li>Darstellung der Statistiken aktualisiert, die Liste ist jetzt übersichtlicher</li>
-                                <li>Das Filtersystem bei den Statistiken filtert jetzt richtig (z. B. Unterkategorien)</li>
-                                <li>
-                                    <strong>Wichtig:</strong> Man kann nun jeder Kategorie Standard-Zeitwerte für Modi
-                                    zuordnen. Fehlen diese, greifen allgemeine Standardwerte.
-                                </li>
-                                <li>Auch die Darstellung der Kategorien wurde geändert, aber noch nicht final.</li>
-                            </ul>
-                        </section>
+                        <ChangelogContent />
                         <button
+                            disabled={!showNotification}
                             className="mark-as-read-button"
                             onClick={markChangelogAsReadHandler}
+                            style={{ marginRight: "10px", marginTop: "10px" }}
                         >
                             Gelesen
                         </button>

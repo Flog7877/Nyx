@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const nodeEnv = process.env.NODE_ENV || 'development';
-console.log('Die ausgelesene NODE_ENV:', nodeEnv);
+console.log('Ausgelesene NODE_ENV:', nodeEnv);
 
 dotenv.config({
   path: nodeEnv === 'production' ? '.env' : '.env.development'
@@ -28,8 +28,6 @@ const checkVerified = require('./middleware/checkVerified');
 
 const app = express();
 const router = express.Router();
-
-console.log('Die Abfrage: ', nodeEnv === 'development');
 
 const port = nodeEnv === 'development' ? 3001 : 3000;
 

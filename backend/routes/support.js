@@ -3,11 +3,8 @@ const db = require('../config/db');
 const rateLimitMap = new Map();
 
 async function supportRouter(req, res) {
-  console.log('Backend empfängt die Nachricht.')
-  console.log('req.user', req.user);
   try {
     const userId = req.user ? req.user.userId : null;
-    console.log('Die userID: ', userId);
     const { name, email, message } = req.body;
 
     let spamKey;
