@@ -130,7 +130,7 @@ app.post('/api/support', verifyToken, supportRouter);
 
 app.post('/api/changelog/read', verifyToken, checkVerified, readChangelog);
 
-app.get('/api/changelog/status', verifyToken, checkVerified, didReadChangelog);
+app.get('/api/changelog/status', verifyToken, checkVerified, didReadChangelog); 
 
 // --------------------------------------------------------------------------------------
 

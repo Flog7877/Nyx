@@ -11,24 +11,28 @@ function Header({ onBurgerClick }) {
     const [showNotification, setShowNotification] = useState(false);
     const navigate = useNavigate();
 
-    // Status der Changelog-Benachrichtigung beim Laden abrufen
     useEffect(() => {
         if (user) {
-            fetchChangelogStatus()
-                .then((data) => setShowNotification(!data.read)) // Zeigt den Kreis nur, wenn "read" false ist
+            fetchChangelogStatus(user)
+                .then((data) => {
+                    setShowNotification(!data.read)
+                    console.log(data);
+                    console.log(showNotification);
+                })
                 .catch((error) => {
                     console.error('Fehler beim Abrufen des Changelog-Status:', error);
-                    setShowNotification(false); // Zur Sicherheit kein Kreis bei Fehlern
+                    setShowNotification(false);
                 });
         }
     }, [user]);
 
-    // Markiere Changelog als gelesen und entferne die Benachrichtigung
     const markChangelogAsReadHandler = () => {
-        markChangelogAsRead()
+        const payload = user;
+        console.log(payload);
+        markChangelogAsRead(payload)
             .then(() => {
-                setShowNotification(false); // Kreis entfernen
-                setIsChangelogOpen(false); // Popup schließen
+                setShowNotification(false);
+                setIsChangelogOpen(false);
             })
             .catch((error) => console.error('Fehler beim Aktualisieren des Changelog-Status:', error));
     };

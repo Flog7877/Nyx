@@ -190,18 +190,18 @@ export const sendSupportMessage = async (payload) => {
   }
 };
 
-export const markChangelogAsRead = async () => {
+export const markChangelogAsRead = async (sessionData) => {
   try {
-    const response = await API.post('/changelog/read');
-    return response.data; 
+    const response = await API.post('/changelog/read', sessionData); 
+    return response.data;
   } catch (error) {
     throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
   }
 };
 
-export const fetchChangelogStatus = async () => {
+export const fetchChangelogStatus = async (sessionData) => {
   try {
-    const response = await API.get('/changelog/status');
+    const response = await API.get('/changelog/status', sessionData);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
