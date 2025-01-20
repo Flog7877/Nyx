@@ -75,7 +75,7 @@ function Header({ onBurgerClick }) {
                                     className="header-version-badge"
                                     onClick={toggleChangelogPopup}
                                 >
-                                    v0.1.2
+                                    v0.1.3
                                     {showNotification && <span className="notification-badge"></span>}
                                 </div>
                             </>
