@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const timestamp = require('../middleware/timestamp');
 
 async function saveSession(req, res) {
     const { user_id, category_id, modus, focusTime, pauseTime, start_time, extra_data } = req.body;
@@ -17,6 +18,7 @@ async function saveSession(req, res) {
         console.error('Fehler beim Speichern der Sitzung:', err);
         return res.status(500).json({ error: 'Datenbankfehler. Bitte an support@flo-g.de wenden.' });
     }
+    console.log(`[${timestamp()}] Benutzer: ${user_id}; Sitzung gespeichert (${pauseTime + focusTime} Sekunden total)`);
     return res.status(201).json({ message: 'Sitzung erfolgreich gespeichert.', sessionId: results.insertId });
 }
 

@@ -1,7 +1,8 @@
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const secretKey = require('../app')
+const secretKey = require('../app');
+const timestamp = require('../middleware/timestamp');
 
 async function login(req, res) {
   const { identifier, password } = req.body;
@@ -47,9 +48,7 @@ async function login(req, res) {
   }
   try {
     const udtQuery = await db.query(updateQuery, [refreshToken, user.id]);
-    const now = new Date();
-    const loginDate = `${now.getDate()}.${now.getMonth() < 12 ? now.getMonth()+1 : 12}.${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`
-    console.log(`[${loginDate}] User eingeloggt:`, user.username);
+    console.log(`[${timestamp()}] User eingeloggt:`, user.username);
     return res.json({
       accessToken,
       refreshToken,

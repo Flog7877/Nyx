@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const timestamp = require('../middleware/timestamp');
 
 async function logout(req, res) {
     const query = 'UPDATE users SET refresh_token = NULL WHERE id = ?';
@@ -9,6 +10,7 @@ async function logout(req, res) {
         return res.status(500).json({ error: 'Datenbankfehler.' });
     }
     res.json({ message: 'Erfolgreich ausgeloggt.' });
+    console.log(`[${timestamp()}] ${req.user} hat sich ausgeloggt.`)
 }
 
 module.exports = logout;

@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const timestamp = require('../middleware/timestamp');
 
 async function changeUsername (req, res) {
 
@@ -40,6 +41,7 @@ async function changeUsername (req, res) {
         return res.status(404).json({ error: 'User nicht gefunden.' });
     }
     res.json({ message: 'Benutzername geändert.' });
+    console.log(`[${timestamp()}] ID: ${userId}; neuer Benutzername: ${newUsername}`)
 }
 
 module.exports = changeUsername;

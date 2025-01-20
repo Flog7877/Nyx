@@ -2,6 +2,7 @@ const db = require('../config/db');
 const mailer = require('../config/mail');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const timestamp = require('../middleware/timestamp');
 
 const mail_text = (uname, link) => `
 Hallo ${uname},
@@ -80,7 +81,7 @@ async function register(req, res) {
             if (mailErr) {
                 console.error('Fehler beim Versenden der Verifizierungs-Mail:', mailErr);
             } else {
-                console.log('Verifizierungs-Mail gesendet:', info.response);
+                console.log(`[${timestamp()}] ${username} hat sich registriert. Verifizierungs-Mail gesendet:`, info.response);
             }
         });
 

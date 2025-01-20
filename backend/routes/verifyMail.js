@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const timestamp = require('../middleware/timestamp');
 
 async function verifyMail(req, res) {
     const currentTime = new Date();
@@ -47,6 +48,7 @@ async function verifyMail(req, res) {
         return res.status(400).json({ error: 'Konnte den Account nicht verifizieren.' });
     }
 
+    console.log(`[${timestamp()}] Mail-Verifiziert von ${user}.`);
     return res.json({ message: 'E-Mail erfolgreich verifiziert. Du kannst dich jetzt einloggen.' });
 }
 
