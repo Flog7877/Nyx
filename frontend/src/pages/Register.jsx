@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { registerUser } from '../api';
+import { useNavigate, Link } from 'react-router-dom';
 import ResendVerification from './ResendVerification';
-import '../assets/Styles/Register.css'
+import '../styles/Register.css'
 
 const Register = () => {
     const [formData, setFormData] = useState({ username: '', email: '', password: '', confirmPassword: '' });
     const [message, setMessage] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -68,70 +70,74 @@ const Register = () => {
 
         try {
             const response = await registerUser(formData);
-            setMessage(`Erfolgreich registriert: Benutzer-ID ${response.userId}. Bitte Postfach überprüfen!`);
+            //setMessage(`Erfolgreich registriert: Benutzer-ID ${response.userId}. Bitte Postfach überprüfen!`);
+            navigate('/accountCreated');
         } catch (error) {
             setMessage(error.error || 'Registrierung fehlgeschlagen.');
         }
     };
 
     return (
-        <div>
-            <h2>Registrieren</h2>
-            <form onSubmit={handleSubmit}>
-                <div className='register-field'>
-                    <label>Benutzername:</label>
-                    <input
-                        className='register-input'
-                        type="text"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className='register-field'>
-                    <label>E-Mail:</label>
-                    <input
-                        className='register-input'
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className='register-field'>
-                    <label>Passwort:</label>
-                    <input
-                        className='register-input'
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        autoComplete="new-password"
-                    />
-                </div>
-                <div className='register-field'>
-                    <label>Passwort bestätigen:</label>
-                    <input
-                        className='register-input'
-                        type="password"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        required
-                        autoComplete="new-password"
-                    />
-                </div>
-                <button type="submit">Registrieren</button>
-            </form>
+        <div className='register-page-container'>
+            <div className='register-wrapper'>
+                <form className="register-form" onSubmit={handleSubmit} >
+                    <p className="register-form-title">Registrierung</p>
+                    <div className="register-input-container">
+                        <input
+                            placeholder="Benutzername"
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            required
+                        />
+                        <span>
+                        </span>
+                    </div>
+                    <div className="register-input-container">
+                        <input
+                            placeholder="Email"
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="register-input-container">
+                        <input
+                            placeholder="Passwort"
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                            autoComplete="new-password"
+                        />
+                    </div>
+                    <div className="register-input-container">
+                        <input
+                            placeholder="Passwort bestätigen"
+                            type="password"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            required
+                            autoComplete="new-password"
+                        />
+                    </div>
+                    <button type="submit" className="register-submit">
+                        Registrieren
+                    </button>
+                    <p className="login-signup-link">
+                                Bereits registriert?&nbsp;&nbsp;
+                                <Link to="/login">
+                                  Anmelden
+                                </Link>
+                              </p>
+                </form>
+            </div>
             {message && <p>{message}</p>}
-
-            <ResendVerification />
-            <p>
-                Probleme mit der Registrierung? Mail an support@flo-g.de
-            </p>
         </div>
     );
 };

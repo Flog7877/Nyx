@@ -16,6 +16,9 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import Support from './pages/Support';
+import AccountCreated from './pages/AccountCreated';
+import ResendVerification from './pages/ResendVerification';
+
 import { AuthProvider } from './AuthContext';
 
 const App = () => {
@@ -37,6 +40,8 @@ const App = () => {
                         <Route path="/EmailVerified" element={<EmailVerified />} />
                         <Route path="/notVerified" element={<NotVerified />} />
                         <Route path="/support" element={<Support />} />
+                        <Route path="/accountCreated" element={<AccountCreated />} />
+                        <Route path="/resendVerification" element={<ResendVerification />} />
                     </Routes>
                 </Layout>
             </Router>

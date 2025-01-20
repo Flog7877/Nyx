@@ -52,7 +52,7 @@ async function forgotPassword(req, res) {
         return res.status(500).json({ error: 'Datenbankfehler' });
     }
     const resetLink = `https://nyx.flo-g.de/resetPassword?token=${token}`;
-    //const resetLink = `http://localhost:5173/Nyx/resetPassword?token=${token}`;
+    //const resetLink = `http://192.168.0.51:5173/resetPassword?token=${token}`;
     const mailOptions = {
         from: '"Flo (noreply)" <noreply@flo-g.de>',
         to: user.email,

@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../api';
 import { AuthContext } from '../AuthContext';
+import '../styles/Login.css'
 
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
@@ -27,47 +28,44 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleLogin}>
-        <div style={{ marginBottom: '10px' }}>
-          <label>
-            Benutzername oder E-Mail:
+    <div className='login-page-container'>
+      <div className='login-wrapper'>
+        <form className="login-form" onSubmit={handleLogin} >
+          <p className="login-form-title">Login</p>
+          <div className="login-input-container">
             <input
-              style={{ marginLeft: '10px' }}
               type="text"
+              placeholder="Benutzername oder Email"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               required
             />
-          </label>
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>
-            Passwort:
+            <span>
+            </span>
+          </div>
+          <div className="login-input-container">
             <input
-              style={{ marginLeft: '10px' }}
               type="password"
-              value={password}
+              placeholder="Passwort"
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-          </label>
-        </div>
-        <button type="submit">Einloggen</button>
-      </form>
-      <p>
+          </div>
+          <button type="submit" className="login-submit">
+            Anmelden
+          </button>
+
+          <p className="login-signup-link">
+            Noch keinen Account?&nbsp;&nbsp;
+            <Link to="/register">
+              Registrieren
+            </Link>
+          </p>
+        </form>
+      </div>
+      <div className='login-help'>
         <Link to="/forgotPassword">Passwort vergessen?</Link>
-      </p>
-      <p>
-        Noch nicht registriert?
-        <Link to="/register" style={{ marginLeft: '8px' }}>
-          Hier registrieren
-        </Link>
-      </p>
-      <p>
-        Bei Problemen mit dem Login: support@flo-g.de
-      </p>
+      </div>
     </div>
   );
 };

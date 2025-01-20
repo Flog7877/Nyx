@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
 import { sendSupportMessage } from '../api';
 
@@ -60,7 +61,7 @@ function Support() {
       </p>
       {!user ? (
         <p style={{ marginTop: '1rem' }}>
-          Um Nachrichten und Feedback zu senden, ist eine Anmeldung notwendig. 
+          Um Direktnachrichten und Feedback zu senden, ist eine Anmeldung notwendig. 
         </p>
       ) : (
         <form onSubmit={handleSubmit} style={{ marginTop: '1rem' }}>
@@ -86,6 +87,12 @@ function Support() {
             {cooldownActive ? `Warte ${secondsLeft} Sek...` : 'Abschicken'}
           </button>
         </form>
+      )}
+      {!user && (
+        <div>
+          Keine Verifizierungs-Mail erhalten?&nbsp;
+          <Link to="/resendVerification">Erneut senden</Link>
+        </div>
       )}
     </div>
   );

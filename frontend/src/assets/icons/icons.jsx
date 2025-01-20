@@ -24,3 +24,5 @@ export { default as DropDownDownIcon } from "./DropDownDownIcon";
 export { default as FilterIcon } from "./FilterIcon";
 export { default as WrenchIcon } from "./WrenchIcon";
 export { default as ToolsIcon } from "./ToolsIcon";
+export { default as PartyIcon } from "./PartyIcon";
+export { default as NewMailIcon } from "./NewMailIcon";

@@ -1,7 +1,7 @@
-// Settings.jsx
 import React, { useEffect, useState } from 'react';
 import API from '../api';
 import { useAuthGuard } from '../utils/auth';
+import '../styles/Settings.css'
 
 function formatToHHMMSS(sec) {
   const hrs = String(Math.floor(sec / 3600)).padStart(2, '0');
