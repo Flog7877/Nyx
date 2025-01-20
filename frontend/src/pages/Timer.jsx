@@ -6,6 +6,7 @@ import API, { saveSession } from '../api';
 import TimerWorker from '../workers/timerWorker.js?worker';
 import { useAuthContext } from '../AuthContext';
 import { useAuthGuard } from '../utils/auth';
+import useIsMobile from '../hooks/useIsMobile';
 
 import {
   MaximizeIcon,
@@ -54,6 +55,8 @@ function formatTime(seconds) {
 const Timer = () => {
 
   useAuthGuard();
+
+  const isMobile = useIsMobile();
 
   const { isFullscreen, setIsFullscreen } = useAuthContext();
 
@@ -146,24 +149,26 @@ const Timer = () => {
   useEffect(() => {
     function updateSize() {
       if (isFullscreen) {
-        const newSize = Math.min(
-          Math.floor(window.innerWidth * 0.8),
-          Math.floor(window.innerHeight * 0.5),
-          600
-        );
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const newSize = isLandscape
+          ? Math.floor(window.innerHeight * 0.5)
+          : Math.floor(window.innerWidth * 0.5);
+
         setCircleSize(newSize);
+        document.documentElement.style.setProperty('--circle-size', newSize + 'px');
       } else {
         setCircleSize(300);
+
       }
     }
 
     updateSize();
     window.addEventListener('resize', updateSize);
-
     return () => {
       window.removeEventListener('resize', updateSize);
     };
   }, [isFullscreen]);
+
 
 
 
@@ -892,68 +897,73 @@ const Timer = () => {
           <br></br><br></br>
         </div>
       )}
-      <div
-        className='displayWrapper'
-        style={{ fontSize: '1.5em' }}
-      >
-        <ProgressCircle
-          progress={progress}
-          size={circleSize}
-          strokeWidth={10}
-          color="#BB86FC"
-        />
+      <div className='fullscreen-content'>
         <div
-          className='timer-display'
-          style={{ fontSize: '200%' }}
+          className='displayWrapper'
+          style={{ fontSize: circleSize * 0.1 }}
         >
-          {formatTime(timeLeft)}
+          <ProgressCircle
+            progress={progress}
+            size={circleSize}
+            strokeWidth={10}
+            color="#BB86FC"
+          />
+          <div
+            className='timer-display'
+            style={{ fontSize: '200%' }}
+          >
+            {formatTime(timeLeft)}
+          </div>
+        </div>
+        <div className='controls-wrapper' >
+          <div
+            className='buttonWrapper'
+            style={{ marginTop: '20px' }}
+          >
+            <div className="tooltip">
+              <button
+                onClick={handleStartPauseResume}
+                disabled={!canStart}
+                style={{
+                  cursor: canStart ? 'pointer' : 'not-allowed',
+                }}
+              >
+                {getStartPauseButtonLabel()}
+              </button>
+              {!canStart && (
+                <span className="tooltiptext">
+                  {startButtonTooltip}
+                </span>
+              )}
+            </div>
+
+            <button onClick={handleReset} style={{ marginLeft: '10px' }}>
+              <StopIcon width='25px' style={{ verticalAlign: '-7px' }} />
+              {isMobile ? '' : <span>&nbsp;&nbsp;Reset</span>}
+            </button>
+
+            <div className="tooltip" style={{ display: 'inline-block', marginLeft: '10px' }}>
+              <button
+                onClick={() => handleSave()}
+                disabled={isRunning}
+                style={{
+                  cursor: isRunning ? 'not-allowed' : 'pointer'
+                }}
+              >
+                <SaveIcon width='25px' style={{ verticalAlign: '-7px' }} />
+                {isMobile ? '' : <span>&nbsp;&nbsp;Speichern</span>}
+              </button>
+              {isRunning && (
+                <span className="tooltiptext">
+                  Speichern ist während eines laufenden Timers nicht möglich! Bitte pausiere den Timer zuerst.
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div
-        className='buttonWrapper'
-        style={{ marginTop: '20px' }}
-      >
-        <div className="tooltip">
-          <button
-            onClick={handleStartPauseResume}
-            disabled={!canStart}
-            style={{
-              cursor: canStart ? 'pointer' : 'not-allowed',
-            }}
-          >
-            {getStartPauseButtonLabel()}
-          </button>
-          {!canStart && (
-            <span className="tooltiptext">
-              {startButtonTooltip}
-            </span>
-          )}
-        </div>
-
-        <button onClick={handleReset} style={{ marginLeft: '10px' }}>
-          <StopIcon width='25px' style={{ verticalAlign: '-7px' }} /> Reset
-        </button>
-
-        <div className="tooltip" style={{ display: 'inline-block', marginLeft: '10px' }}>
-          <button
-            onClick={() => handleSave()}
-            disabled={isRunning}
-            style={{
-              cursor: isRunning ? 'not-allowed' : 'pointer'
-            }}
-          >
-            <SaveIcon width='18px' style={{ verticalAlign: '-2.25px' }} /> Speichern
-          </button>
-          {isRunning && (
-            <span className="tooltiptext">
-              Speichern ist während eines laufenden Timers nicht möglich! Bitte pausiere den Timer zuerst.
-            </span>
-          )}
-        </div>
-      </div>
-
-      {mode === MODES.POMODORO && (
+      {mode === MODES.POMODORO && !isFullscreen && (
         <div style={{ marginTop: '10px' }}>
           <br></br>
           <p><strong>Runde:</strong> {round}</p>
@@ -961,7 +971,7 @@ const Timer = () => {
         </div>
       )}
 
-      {mode === MODES.PING && (
+      {mode === MODES.PING && !isFullscreen && (
         <div style={{ marginTop: '10px' }}>
           <br></br>
           <p><strong>Pings bisher:</strong> {pingCount}</p>
