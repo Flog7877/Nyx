@@ -67,7 +67,7 @@
 
 .header-button {
     padding: 7.5px;
-    padding-right: 6;
+    padding-right: 0;
 }
 
 .icon-button {
@@ -105,13 +105,13 @@
     justify-content: center;
     align-items: center;
     position: absolute;
-    top: -2.25px; /* Vertikale Position anpassen */
-    right: -4.75px; /* Horizontale Position anpassen */
-    width: 10px; /* Kleinere Breite */
-    height: 10px; /* Kleinere Höhe */
-    background-color: #CF6679; /* Hintergrundfarbe des Kreises */
-    border-radius: 50%; /* Macht es zu einem Kreis */
-    pointer-events: none; /* Verhindert Interaktionen */
+    top: -2.25px;
+    right: -4.75px;
+    width: 10px;
+    height: 10px;
+    background-color: #CF6679;
+    border-radius: 50%;
+    pointer-events: none;
 }
 
 
@@ -199,4 +199,60 @@
 
 .features {
     padding-left: 1.5em;
+}
+
+.mobile-user-icon-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.user-popup {
+    position: absolute;
+    right: 0;
+    top: 40px;
+    background-color: #2c2c2c;
+    color: #fff;
+    padding: 8px 12px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    z-index: 9999;
+    min-width: 150px;
+}
+
+.user-popup p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+.icon-button-mobile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    margin-right: .5rem;
+    padding: 0 !important;
+    margin-left: 5.203px;
+}
+
+.mobile-sidebar-overlay {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 64px);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 900;
+}
+
+.header-right-wrapper {
+    display: flex;
+    align-items: center;
 }

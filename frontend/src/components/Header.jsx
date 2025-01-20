@@ -5,12 +5,15 @@ import { UserIcon, SidebarIcon, LoginIcon, LogoutIcon, ToolsIcon } from '../asse
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchChangelogStatus, markChangelogAsRead } from '../api';
 import ChangelogContent from './ChangelogContent';
+import useIsMobile from '../hooks/useIsMobile';
 
 
 function Header({ onBurgerClick }) {
+    const isMobile = useIsMobile();
     const { user, logout, isFullscreen } = useContext(AuthContext);
     const [isChangelogOpen, setIsChangelogOpen] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
+    const [isUserPopupOpen, setIsUserPopupOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -45,6 +48,10 @@ function Header({ onBurgerClick }) {
         setIsChangelogOpen(!isChangelogOpen);
     };
 
+    const toggleUserPopup = () => {
+        setIsUserPopupOpen(!isUserPopupOpen);
+    };
+
     if (isFullscreen) return null;
 
     return (
@@ -54,6 +61,7 @@ function Header({ onBurgerClick }) {
                     <button className="icon-button" onClick={onBurgerClick}>
                         <SidebarIcon width="20px" height="20px" />
                     </button>
+
                     <div className="header-logo-and-title">
                         <img
                             src="/favicon.png"
@@ -61,47 +69,70 @@ function Header({ onBurgerClick }) {
                             className="header-logo"
                         />
                         <span className="header-project-name">Projekt Nyx</span>
-                        <div
-                            className="header-version-badge"
-                            onClick={toggleChangelogPopup}
-                        >
-                            v0.1.2
-                            {showNotification && <span className="notification-badge"></span>}
-                        </div>
+                        {!isMobile && (
+                            <>
+                                <div
+                                    className="header-version-badge"
+                                    onClick={toggleChangelogPopup}
+                                >
+                                    v0.1.2
+                                    {showNotification && <span className="notification-badge"></span>}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
-
-                <div className="header-right">
+                <div className='header-right-wrapper'>
                     {user && (
-                        <span style={{ marginRight: '20px' }}>
-                            <UserIcon width="15px" style={{ verticalAlign: '-2px' }} /> {user.username} (ID: {user.userId})
-                        </span>
+                        <>
+                            {isMobile ? (
+                                <div className="mobile-user-icon-container">
+                                    <button
+                                        className="icon-button-mobile"
+                                        onClick={toggleUserPopup}
+                                    >
+                                        <UserIcon width="20px" height="20px" />
+                                    </button>
+                                    {isUserPopupOpen && (
+                                        <div className="user-popup" onClick={(e) => e.stopPropagation()}>
+                                            <p><strong>{user.username}</strong></p>
+                                            <p>ID: {user.userId}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <span style={{ marginRight: '20px' }}>
+                                    <UserIcon width="15px" style={{ verticalAlign: '-2px' }} />
+                                    {' ' + user.username} (ID: {user.userId})
+                                </span>
+                            )}
+                        </>
                     )}
-                    <button
-                        onClick={user ? handleLogout : () => navigate('/login')}
-                        style={{ marginRight: '25px' }}
-                        className="header-button"
-                    >
-                        {user ? (
+                    <div className="header-right">
+                        <button
+                            onClick={user ? handleLogout : () => navigate('/login')}
+                            style={{ marginRight: '25px' }}
+                            className="header-button"
+                        >
                             <div className="header-link">
                                 <div className="header-icon">
-                                    <LogoutIcon width="20px" height="20px" />
+                                    {user ? (
+                                        <LogoutIcon width="20px" height="20px" />
+                                    ) : (
+                                        <LoginIcon width="20px" height="20px" />
+                                    )}
                                 </div>
-                                Abmelden
+                                {!isMobile && (
+                                    <>
+                                        {user ? <span>Abmelden&nbsp;&nbsp;</span> : <span>Anmelden&nbsp;&nbsp;</span>}
+                                    </>
+                                )}
                             </div>
-                        ) : (
-                            <div className="header-link">
-                                <div className="header-icon">
-                                    <LoginIcon width="20px" height="20px" />
-                                </div>
-                                Anmelden
-                            </div>
-                        )}
-                    </button>
+                        </button>
+                    </div>
                 </div>
             </header>
-
-            {isChangelogOpen && (
+            {!isMobile && isChangelogOpen && (
                 <div className="changelog-popup-overlay" onClick={toggleChangelogPopup}>
                     <div
                         className="changelog-popup"

@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Überprüfe den Benutzerstatus beim Laden der App
   useEffect(() => {
     const validateUser = async () => {
       try {

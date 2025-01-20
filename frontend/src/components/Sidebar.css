@@ -10,6 +10,7 @@
     transition: width 0.3s ease, transform 0.3s ease;
     z-index: 999;
     width: 200px;
+    overflow-y: auto;
 }
 
 .sidebar-menu {
@@ -88,4 +89,3 @@
         transform: translateX(0);
     }
 }
-

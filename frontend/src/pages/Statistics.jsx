@@ -8,6 +8,7 @@ import {
   DropDownDownIcon,
   FilterIcon
 } from '../assets/icons/icons';
+import useIsMobile from '../hooks/useIsMobile';
 
 function formatTime(sec) {
   const hrs = String(Math.floor(sec / 3600)).padStart(2, '0');
@@ -232,7 +233,8 @@ function SessionListItem({
   isOpen,
   toggleOpen,
   onRoundCommentUpdate,
-  categoryMap
+  categoryMap,
+  isMobile
 }) {
   let data = null;
   if (session.extra_data) {
@@ -258,7 +260,7 @@ function SessionListItem({
             ? <DropDownDownIcon width="32px" style={{ verticalAlign: '-17px' }} />
             : <DropDownRightIcon width="32px" style={{ verticalAlign: '-17px' }} />}
         </button>
-        <span>Session {session.id}</span>
+        {!isMobile && (<span>Session {session.id}</span>)}
         <div className="header-right">
           <span
             className="session-category"
@@ -338,6 +340,8 @@ function SessionListItem({
 
 function Statistics() {
   useAuthGuard();
+
+  const isMobile = useIsMobile();
 
   const [sessions, setSessions] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -514,6 +518,7 @@ function Statistics() {
                   onEditClick={() => openEditModal(session)}
                   onRoundCommentUpdate={handleRoundCommentUpdate}
                   categoryMap={categoryMap}
+                  isMobile={isMobile}
                 />
               );
             })}
