@@ -207,3 +207,21 @@ export const fetchChangelogStatus = async (sessionData) => {
     throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
   }
 };
+
+export const getPreferences = async () => {
+  try {
+    const response = await API.get('/getPreferences');
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
+  }
+};
+
+export const updatePreferences = async (prefs) => {
+  try {
+    const response = await API.put('/putPreferences', prefs);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { error: 'Netzwerkfehler' };
+  }
+};

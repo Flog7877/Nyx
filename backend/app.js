@@ -32,7 +32,7 @@ const router = express.Router();
 const port = nodeEnv === 'development' ? 3001 : 3000;
 
 const corsOptions = {
-  origin: nodeEnv === 'development' ? 'http://192.168.0.51:5173' : 'https://nyx.flo-g.de',
+  origin: nodeEnv === 'development' ? 'https://192.168.0.51:5173' : 'https://nyx.flo-g.de',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
@@ -71,6 +71,8 @@ const supportRouter = require('./routes/support');
 const getCategorySettings = require('./routes/getCategorySettings');
 const readChangelog = require('./routes/readChangelog');
 const didReadChangelog = require('./routes/didReadChangelog');
+const getPreferences = require('./routes/getPreferences');
+const putPreferences = require('./routes/putPreferences');
 
 // ----------------------------------------------------------------------------
 
@@ -129,6 +131,10 @@ app.post('/api/support', verifyToken, supportRouter);
 app.post('/api/changelog/read', verifyToken, checkVerified, readChangelog);
 
 app.get('/api/changelog/status', verifyToken, checkVerified, didReadChangelog); 
+
+app.get('/api/getPreferences', verifyToken, checkVerified, getPreferences); 
+
+app.put('/api/putPreferences', verifyToken, checkVerified, putPreferences);
 
 // --------------------------------------------------------------------------------------
 

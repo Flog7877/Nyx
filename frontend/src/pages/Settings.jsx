@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import API from '../api';
 import { useAuthGuard } from '../utils/auth';
+import { getPreferences, updatePreferences } from '../api';
 import '../styles/Settings.css'
 
 function formatToHHMMSS(sec) {
@@ -26,6 +27,8 @@ function Settings() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
 
+  const [notificationMode, setNotificationMode] = useState(false);
+
   const [timerFocus, setTimerFocus] = useState('00:25:00');
   const [timerPause, setTimerPause] = useState('00:05:00');
   const [timerPing, setTimerPing] = useState('00:15:00');
@@ -37,7 +40,18 @@ function Settings() {
 
   useEffect(() => {
     loadSettings();
+    loadPreferences();
   }, []);
+
+  const loadPreferences = async () => {
+    try {
+      const pref = await getPreferences();
+      setNotificationMode(!!pref.notification_mode);
+    } catch (e) {
+      console.error(e);
+      setMessage('Fehler beim Laden der Benachrichtigungseinstellungen.');
+    }
+  };
 
   const loadSettings = async () => {
     try {
@@ -115,6 +129,47 @@ function Settings() {
       setMessage(err.error || 'Fehler');
     }
   };
+
+  const handleToggleNotification = async (e) => {
+    const newValue = e.target.checked;
+    if (newValue) {
+      // Aktivierung
+      if (Notification.permission === 'granted') {
+        setNotificationMode(true);
+        try {
+          await updatePreferences({ notification_mode: true });
+          setMessage('Benachrichtigungen aktiviert.');
+        } catch (err) {
+          setMessage('Fehler beim Speichern.');
+        }
+      } else {
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission === 'granted') {
+            setNotificationMode(true);
+            await updatePreferences({ notification_mode: true });
+            setMessage('Benachrichtigungen aktiviert.');
+          } else {
+            setMessage('Benachrichtigungen wurden verweigert.');
+            setNotificationMode(false);
+          }
+        } catch (err) {
+          console.error(err);
+          setMessage('Fehler bei der Anfrage.');
+          setNotificationMode(false);
+        }
+      }
+    } else {
+      setNotificationMode(false);
+      try {
+        await updatePreferences({ notification_mode: false });
+        setMessage('Benachrichtigungen deaktiviert.');
+      } catch (err) {
+        setMessage('Fehler beim Speichern.');
+      }
+    }
+  };
+
 
   const handleDeleteUser = async () => {
     if (!deletePw) {
@@ -214,6 +269,27 @@ function Settings() {
         />
       </div>
       <button onClick={handleSaveTimer}>Speichern</button>
+
+      <h2>Benachrichtigungen</h2>
+      <div className="toggler">
+        <input
+          id="toggler-notifications"
+          name="notification-toggle"
+          type="checkbox"
+          checked={notificationMode}
+          onChange={handleToggleNotification}
+        />
+        <label htmlFor="toggler-notifications">
+          <svg className="toggler-on" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+            <polyline className="path check" points="100.2,40.2 51.5,88.8 29.8,67.5"></polyline>
+          </svg>
+          <svg className="toggler-off" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+            <line className="path line" x1="34.4" y1="34.4" x2="95.8" y2="95.8"></line>
+            <line className="path line" x1="95.8" y1="34.4" x2="34.4" y2="95.8"></line>
+          </svg>
+        </label>
+      </div>
+
 
       <h2>Benutzer löschen</h2>
       <div>
