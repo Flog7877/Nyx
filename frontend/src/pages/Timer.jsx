@@ -1,6 +1,7 @@
 import '../assets/Styles/TimerFullscreen.css';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import HtmlDurationPicker from 'html-duration-picker/dist/html-duration-picker.min.js';
+import DurationInput from '../components/DurationInput';
 
 import API, { saveSession } from '../api';
 import { getPreferences, updatePreferences } from '../api';
@@ -26,6 +27,7 @@ import ProgressCircle from '../components/ProgressCircle';
 const sessionEndAudio = new Audio('/sounds/sessionEnd.wav');
 const sessionStartAudio = new Audio('/sounds/sessionStart.wav');
 const pingAudio = new Audio('/sounds/ping.mp3');
+const sessionFinal = new Audio('/sounds/sessionFinal.mp3')
 
 const MODES = {
   POMODORO: 'Pomodoro',
@@ -83,9 +85,9 @@ const Timer = () => {
   const [notificationMode, setNotificationMode] = useState(false);
   const notificationModeRef = useRef(notificationMode);
 
-  useEffect(() => {
-    notificationModeRef.current = notificationMode;
-  }, [notificationMode]);
+  const [limitEnabled, setLimitEnabled] = useState(false);
+  const [limitInput, setLimitInput] = useState('01:30:00');
+  const [limitSeconds, setLimitSeconds] = useState(null);
 
   const [round, setRound] = useState(0);
   const [isFocusPhase, setIsFocusPhase] = useState(true);
@@ -116,12 +118,29 @@ const Timer = () => {
   const elapsedFocusTimeRef = useRef(elapsedFocusTime);
   const elapsedPauseTimeRef = useRef(elapsedPauseTime);
   const roundRef = useRef(round);
+  const limitSecondsRef = useRef(limitSeconds);
+  const limitEnabledRef = useRef(limitEnabled);
 
   useEffect(() => {
+    notificationModeRef.current = notificationMode;
+  }, [notificationMode]);
+
+  useEffect(() => {
+    if (limitEnabled) {
+      const seconds = validateTimeString(limitInput);
+      if (seconds !== null) {
+        setLimitSeconds(seconds);
+      }
+    }
+  }, [limitInput, limitEnabled]);
+
+  useEffect(() => {
+    limitEnabledRef.current = limitEnabled;
+    limitSecondsRef.current = limitSeconds;
     elapsedFocusTimeRef.current = elapsedFocusTime;
     elapsedPauseTimeRef.current = elapsedPauseTime;
     roundRef.current = round;
-  }, [elapsedFocusTime, elapsedPauseTime, round]);
+  }, [elapsedFocusTime, elapsedPauseTime, round, limitSeconds, limitEnabled]);
 
   const loadUserSettings = async () => {
     try {
@@ -371,6 +390,26 @@ const Timer = () => {
             setElapsedFocusTime((prev) => prev + 1);
           } else {
             setElapsedFocusTime((prev) => prev + 1);
+          }
+
+          if (limitEnabledRef.current && limitSecondsRef.current !== null) {
+            const totalElapsed = elapsedFocusTimeRef.current + elapsedPauseTimeRef.current;
+            if (totalElapsed + 1 >= limitSecondsRef.current) {
+              pauseWorker();
+              sessionFinal.play();
+              if (notificationModeRef.current && Notification.permission === 'granted' && "Notification" in window) {
+                try {
+                  navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification("Sitzung zuende!", {
+                      body: `Das Sitzungslimit von ${formatTime(limitSecondsRef.current)} wurde erreicht. Herzlichen Glückwunsch!`,
+                      icon: "/favicon.png"
+                    });
+                  });
+                } catch (error) {
+                  console.error("Fehler beim Senden der Benachrichtigung:", error);
+                }
+              }
+            }
           }
           break;
         }
@@ -713,6 +752,7 @@ const Timer = () => {
   const clearElapsedTimes = () => {
     setElapsedFocusTime(0);
     setElapsedPauseTime(0);
+    handleReset();
   };
 
   const getStartPauseButtonLabel = () => {
@@ -981,6 +1021,33 @@ const Timer = () => {
             </div>
           )}
 
+          {mode !== MODES.TIMER && (
+            <div style={{ display: 'flex', justifyContent: 'left', alignItems: 'center' }}>
+              <div>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={limitEnabled}
+                    onChange={(e) => setLimitEnabled(e.target.checked)}
+                    disabled={isRunning}
+                  />
+                  &nbsp;&nbsp;Zeitlimit&nbsp;&nbsp;
+                </label>
+              </div>
+              {limitEnabled && (
+                <DurationInput
+                  initialValue={limitInput}
+                  onSubmit={(formatted) => setLimitInput(formatted)}
+                  disabled={isRunning}
+                />
+              )}
+              <div>
+                <br></br>
+                <br></br>
+              </div>
+            </div>
+          )}
+
           {mode !== MODES.CHRONOGRAPH && (
             <div className="tooltip applyButton">
               <button
@@ -997,6 +1064,7 @@ const Timer = () => {
               )}
             </div>
           )}
+
           <br></br><br></br>
         </div>
       )}
@@ -1146,11 +1214,31 @@ const Timer = () => {
       )}
 
       {saveFeedback && <p style={{ marginTop: '10px' }}>{saveFeedback}</p>}
+
+      {limitEnabled && limitSeconds && mode !== MODES.TIMER && (
+        <div className="limit-status">
+          <p><strong>Limit:</strong> {limitInput}</p>
+          <p>
+            <strong>Fortschritt:</strong>{" "}
+            {Math.min(
+              ((elapsedFocusTime + elapsedPauseTime) / limitSeconds) * 100,
+              100
+            ).toFixed(2)}
+            %
+          </p>
+        </div>
+      )}
+
       {!isFullscreen && (
         <div style={{ marginTop: '20px', borderTop: '1px solid' }}>
-          <h3>Vergangene Zeit</h3>
-          <p><strong>Fokuszeit:</strong> {formatTime(elapsedFocusTime)}</p>
-          <p><strong>Pausenzeit:</strong> {formatTime(elapsedPauseTime)}</p>
+          <h3>Aktuelle Sitzung</h3>
+          <p><strong>Verstrichene Zeit:</strong> {formatTime(elapsedFocusTime + elapsedPauseTime)}</p>
+          {mode === MODES.POMODORO && (
+            <div>
+              <p>Davon <strong>Fokuszeit:</strong> {formatTime(elapsedFocusTime)}</p>
+              <p>Davon <strong>Pausenzeit:</strong> {formatTime(elapsedPauseTime)}</p>
+            </div>
+          )}
           <button onClick={clearElapsedTimes} style={{ marginTop: '2px' }}>
             <DeleteIcon width='18px' style={{ verticalAlign: '-3px' }} /> Clear Session
           </button>
