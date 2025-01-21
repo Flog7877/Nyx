@@ -7,8 +7,11 @@ const ChangelogContent = () => (
         </h4>
         <ul className="features" >
             <li>Es gibt jetzt einen Handymodus! Es werden nun auch kleine Bildschirme unterstützt.</li>
+            <li>Die UI beim Anmeldungs-/ Registrierungsprozess wurde verbessert.</li>
+            <li>Ein <strong>Notification-Modus</strong> wurde hinzugefügt. Mehr dazu in den Einstellungen!</li>
             <li>Der Fullscreen-Modus funktioniert jetzt (einigermaßen) vernünftig.</li>
         </ul>
+        <strong>Datum:</strong> 21.01.2024
         <h4>
             <span className="popup-version-badge">v0.1.2</span>
         </h4>
@@ -21,6 +24,7 @@ const ChangelogContent = () => (
             </li>
             <li>Auch die Darstellung der Kategorien wurde geändert, aber noch nicht final.</li>
         </ul>
+        <strong>Datum:</strong> 14.01.2024
     </section>
 );
 

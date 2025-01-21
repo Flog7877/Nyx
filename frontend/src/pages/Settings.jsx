@@ -3,6 +3,7 @@ import API from '../api';
 import { useAuthGuard } from '../utils/auth';
 import { getPreferences, updatePreferences } from '../api';
 import '../styles/Settings.css'
+import { Link } from 'react-router-dom';
 
 function formatToHHMMSS(sec) {
   const hrs = String(Math.floor(sec / 3600)).padStart(2, '0');
@@ -270,24 +271,51 @@ function Settings() {
       </div>
       <button onClick={handleSaveTimer}>Speichern</button>
 
-      <h2>Benachrichtigungen</h2>
-      <div className="toggler">
-        <input
-          id="toggler-notifications"
-          name="notification-toggle"
-          type="checkbox"
-          checked={notificationMode}
-          onChange={handleToggleNotification}
-        />
-        <label htmlFor="toggler-notifications">
-          <svg className="toggler-on" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
-            <polyline className="path check" points="100.2,40.2 51.5,88.8 29.8,67.5"></polyline>
-          </svg>
-          <svg className="toggler-off" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
-            <line className="path line" x1="34.4" y1="34.4" x2="95.8" y2="95.8"></line>
-            <line className="path line" x1="95.8" y1="34.4" x2="34.4" y2="95.8"></line>
-          </svg>
-        </label>
+      <div className='notification-settings-wrapper'>
+        <h2>Benachrichtigungen</h2>
+        <p style={{ textAlign: 'justify', textJustify: 'inter-word' }}>
+          Optional können zusätzlich zu den Tönen auch Benachrichtigungen mit den aktuellen Daten gesendet werden (z.B. beim Wechsel Fokus-Pause oder einem Ping). Dafür muss diese Seite Berechtigungen haben, Benachrichtigungen zu schicken. Der Benachrichtigungsmodus kann hier jederzeit aktiviert und deaktiviert werden.
+        </p>
+        <div className='notification-toggle-wrapper'>
+          <div>
+            Notification-Modus:&nbsp;&nbsp;&nbsp;
+          </div>
+          <div className="toggler">
+            <input
+              id="toggler-notifications"
+              name="notification-toggle"
+              type="checkbox"
+              checked={notificationMode}
+              onChange={handleToggleNotification}
+            />
+            <label htmlFor="toggler-notifications">
+              <svg className="toggler-on" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+                <polyline className="path check" points="100.2,40.2 51.5,88.8 29.8,67.5"></polyline>
+              </svg>
+              <svg className="toggler-off" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+                <line className="path line" x1="34.4" y1="34.4" x2="95.8" y2="95.8"></line>
+                <line className="path line" x1="95.8" y1="34.4" x2="34.4" y2="95.8"></line>
+              </svg>
+            </label>
+          </div>
+        </div>
+        <p>
+          Probleme mit Benachrichtigungen oder Berechtigungen? <a href='https://www.stern.de/sonst/browser-benachrichtungen-an--und-abschalten-8543416.html' target="_blank" rel="noopener noreferrer">Hilfe</a>
+        </p>
+        {Notification.permission === 'denied' && (
+          <div>
+            <div className="notification-warning">
+              Hinweis: Benachrichtigungen sind deaktiviert.
+            </div>
+            <p style={{ fontSize: '80%' }} >
+              Dies könnte möglicherweise eine Standartbrowsereinstellung sein.<br></br>
+              Falls es hierzu Fragen gibt:&nbsp;
+              <Link to="/support">
+                Support
+              </Link>
+            </p>
+          </div>
+        )}
       </div>
 
 
