@@ -381,11 +381,13 @@ const Timer = () => {
           setIsPaused(false);
           if (notificationModeRef.current && Notification.permission === 'granted' && "Notification" in window) {
             try {
-              new Notification("Timer abgelaufen!", {
-                icon: "/favicon.png"
+              navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification("Timer abgelaufen!", {
+                  icon: "/favicon.png"
+                });
               });
             } catch (error) {
-              console.error("Fehler beim Senden der Ping-Benachrichtigung:", error);
+              console.error("Fehler beim Senden der Benachrichtigung:", error);
             }
           }
           break;
@@ -396,12 +398,14 @@ const Timer = () => {
           setTimeLeft(timeSettingsRef.current.pause);
           if (notificationModeRef.current && Notification.permission === 'granted' && "Notification" in window) {
             try {
-              new Notification("Fokus-Runde vorbei!", {
-                body: `Jetzt: eine Pause von ${formatTime(timeSettingsRef.current.pause)}\nVergangene Zeit: ${formatTime(elapsedFocusTimeRef.current + elapsedPauseTimeRef.current)}\nAktuelle Runde: ${roundRef.current}`,
-                icon: "/favicon.png"
+              navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification("Fokus-Runde vorbei!", {
+                  body: `Jetzt: eine Pause von ${formatTime(timeSettingsRef.current.pause)}\nVergangene Zeit: ${formatTime(elapsedFocusTimeRef.current + elapsedPauseTimeRef.current)}\nAktuelle Runde: ${roundRef.current}`,
+                  icon: "/favicon.png"
+                });
               });
             } catch (error) {
-              console.error("Fehler beim Senden der Ping-Benachrichtigung:", error);
+              console.error("Fehler beim Senden der Benachrichtigung:", error);
             }
           }
           break;
@@ -413,12 +417,14 @@ const Timer = () => {
           setTimeLeft(timeSettingsRef.current.focus);
           if (notificationModeRef.current && Notification.permission === 'granted' && "Notification" in window) {
             try {
-              new Notification("Pause vorbei!", {
-                body: `Jetzt beginnt Runde ${roundRef.current + 1}.\nVergangene Zeit: ${formatTime(elapsedFocusTimeRef.current + elapsedPauseTimeRef.current)}`,
-                icon: "/favicon.png"
+              navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification("Pause vorbei!", {
+                  body: `Jetzt beginnt Runde ${roundRef.current + 1}.\nVergangene Zeit: ${formatTime(elapsedFocusTimeRef.current + elapsedPauseTimeRef.current)}`,
+                  icon: "/favicon.png"
+                });
               });
             } catch (error) {
-              console.error("Fehler beim Senden der Ping-Benachrichtigung:", error);
+              console.error("Fehler beim Senden der Benachrichtigung:", error);
             }
           }
           break;
@@ -428,12 +434,14 @@ const Timer = () => {
           pingAudio.play();
           if (notificationModeRef.current && Notification.permission === 'granted' && "Notification" in window) {
             try {
-              new Notification("Ping!", {
-                body: `Vergangene Zeit: ${formatTime(elapsedFocusTimeRef.current)}\nErhaltene Pings: ${workerPingCount}`,
-                icon: "/favicon.png"
+              navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification("Ping!", {
+                  body: `Vergangene Zeit: ${formatTime(elapsedFocusTimeRef.current)}\nErhaltene Pings: ${workerPingCount}`,
+                  icon: "/favicon.png"
+                });
               });
             } catch (error) {
-              console.error("Fehler beim Senden der Ping-Benachrichtigung:", error);
+              console.error("Fehler beim Senden der Benachrichtigung:", error);
             }
           }
           break;
