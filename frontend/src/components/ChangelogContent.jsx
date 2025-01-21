@@ -10,6 +10,7 @@ const ChangelogContent = () => (
             <li>Die UI beim Anmeldungs-/ Registrierungsprozess wurde verbessert.</li>
             <li>Ein <strong>Notification-Modus</strong> wurde hinzugefügt. Mehr dazu in den Einstellungen!</li>
             <li>Der Fullscreen-Modus funktioniert jetzt (einigermaßen) vernünftig.</li>
+            <li>Man kann jetzt ein Sitzungs-Limit einstellen.</li>
         </ul>
         <strong>Datum:</strong> 21.01.2024
         <h4>
