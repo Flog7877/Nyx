@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import HtmlDurationPicker from 'html-duration-picker/dist/html-duration-picker.min.js';
 
 import API, { saveSession } from '../api';
+import { getPreferences, updatePreferences } from '../api';
 import TimerWorker from '../workers/timerWorker.js?worker';
 import { useAuthContext } from '../AuthContext';
 import { useAuthGuard } from '../utils/auth';
@@ -79,6 +80,12 @@ const Timer = () => {
   const [canStart, setCanStart] = useState(true);
   const [startButtonTooltip, setStartButtonTooltip] = useState('');
   const [sessionStartTime, setSessionStartTime] = useState(null);
+  const [notificationMode, setNotificationMode] = useState(false);
+  const notificationModeRef = useRef(notificationMode);
+
+  useEffect(() => {
+    notificationModeRef.current = notificationMode;
+  }, [notificationMode]);
 
   const [round, setRound] = useState(0);
   const [isFocusPhase, setIsFocusPhase] = useState(true);
@@ -106,6 +113,15 @@ const Timer = () => {
   const [globalSettings, setGlobalSettings] = useState({});
   const [rawCategories, setRawCategories] = useState([]);
 
+  const elapsedFocusTimeRef = useRef(elapsedFocusTime);
+  const elapsedPauseTimeRef = useRef(elapsedPauseTime);
+  const roundRef = useRef(round);
+
+  useEffect(() => {
+    elapsedFocusTimeRef.current = elapsedFocusTime;
+    elapsedPauseTimeRef.current = elapsedPauseTime;
+    roundRef.current = round;
+  }, [elapsedFocusTime, elapsedPauseTime, round]);
 
   const loadUserSettings = async () => {
     try {
@@ -132,6 +148,22 @@ const Timer = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    loadPreferences();
+  }, []);
+
+  const loadPreferences = async () => {
+    try {
+      const pref = await getPreferences();
+      const enableNotif = pref.notification_mode === 1 ? true : false;
+      setNotificationMode(enableNotif);
+    } catch (e) {
+      console.error(e);
+      setMessage('Fehler beim Laden der Benachrichtigungseinstellungen.');
+    }
+  };
+
 
   useEffect(() => {
     if (HtmlDurationPicker) {
@@ -168,10 +200,6 @@ const Timer = () => {
       window.removeEventListener('resize', updateSize);
     };
   }, [isFullscreen]);
-
-
-
-
 
   useEffect(() => {
     function buildHierarchyAndFlatten(catArray) {
@@ -351,12 +379,31 @@ const Timer = () => {
           sessionEndAudio.play();
           setIsRunning(false);
           setIsPaused(false);
+          if (notificationModeRef.current && Notification.permission === 'granted' && "Notification" in window) {
+            try {
+              new Notification("Timer abgelaufen!", {
+                icon: "/favicon.png"
+              });
+            } catch (error) {
+              console.error("Fehler beim Senden der Ping-Benachrichtigung:", error);
+            }
+          }
           break;
 
         case 'pauseStart':
           sessionEndAudio.play();
           setIsFocusPhase(false);
           setTimeLeft(timeSettingsRef.current.pause);
+          if (notificationModeRef.current && Notification.permission === 'granted' && "Notification" in window) {
+            try {
+              new Notification("Fokus-Runde vorbei!", {
+                body: `Jetzt: eine Pause von ${formatTime(timeSettingsRef.current.pause)}\nVergangene Zeit: ${formatTime(elapsedFocusTimeRef.current + elapsedPauseTimeRef.current)}\nAktuelle Runde: ${roundRef.current}`,
+                icon: "/favicon.png"
+              });
+            } catch (error) {
+              console.error("Fehler beim Senden der Ping-Benachrichtigung:", error);
+            }
+          }
           break;
 
         case 'focusStart':
@@ -364,11 +411,31 @@ const Timer = () => {
           setRound((prev) => prev + 1);
           setIsFocusPhase(true);
           setTimeLeft(timeSettingsRef.current.focus);
+          if (notificationModeRef.current && Notification.permission === 'granted' && "Notification" in window) {
+            try {
+              new Notification("Pause vorbei!", {
+                body: `Jetzt beginnt Runde ${roundRef.current + 1}.\nVergangene Zeit: ${formatTime(elapsedFocusTimeRef.current + elapsedPauseTimeRef.current)}`,
+                icon: "/favicon.png"
+              });
+            } catch (error) {
+              console.error("Fehler beim Senden der Ping-Benachrichtigung:", error);
+            }
+          }
           break;
 
         case 'ping':
           setPingCount(workerPingCount);
           pingAudio.play();
+          if (notificationModeRef.current && Notification.permission === 'granted' && "Notification" in window) {
+            try {
+              new Notification("Ping!", {
+                body: `Vergangene Zeit: ${formatTime(elapsedFocusTimeRef.current)}\nErhaltene Pings: ${workerPingCount}`,
+                icon: "/favicon.png"
+              });
+            } catch (error) {
+              console.error("Fehler beim Senden der Ping-Benachrichtigung:", error);
+            }
+          }
           break;
 
         case 'reset':
@@ -626,6 +693,7 @@ const Timer = () => {
 
       setElapsedFocusTime(0);
       setElapsedPauseTime(0);
+      handleReset();
 
     } catch (error) {
       console.error('Fehler beim Speichern der Sitzung:', error);
@@ -769,7 +837,14 @@ const Timer = () => {
                 <select
                   style={{ marginLeft: '10px' }}
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    if (elapsedFocusTimeRef.current > 0) {
+                      handleSave();
+                    } else {
+                      handleReset();
+                    }
+                  }}
                   disabled={isRunning}
                 >
                   <option value="">Keine Kategorie</option>
@@ -798,6 +873,11 @@ const Timer = () => {
                     onChange={(e) => {
                       changedState();
                       setFocusInput(e.target.value);
+                      if (elapsedFocusTimeRef.current > 0) {
+                        handleSave();
+                      } else {
+                        handleReset();
+                      }
                     }}
                     data-duration="1500"
                   />
@@ -819,6 +899,11 @@ const Timer = () => {
                     onChange={(e) => {
                       changedState();
                       setPauseInput(e.target.value);
+                      if (elapsedFocusTimeRef.current > 0) {
+                        handleSave();
+                      } else {
+                        handleReset();
+                      }
                     }}
                     data-duration="300"
                   />
@@ -844,6 +929,11 @@ const Timer = () => {
                   onChange={(e) => {
                     changedState();
                     setPingInput(e.target.value);
+                    if (elapsedFocusTimeRef.current > 0) {
+                      handleSave();
+                    } else {
+                      handleReset();
+                    }
                   }}
                   data-duration="900"
                 />
@@ -868,6 +958,11 @@ const Timer = () => {
                   onChange={(e) => {
                     changedState();
                     setTimerInput(e.target.value);
+                    if (elapsedFocusTimeRef.current > 0) {
+                      handleSave();
+                    } else {
+                      handleReset();
+                    }
                   }}
                   data-duration="600"
                 />

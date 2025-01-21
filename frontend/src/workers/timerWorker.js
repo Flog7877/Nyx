@@ -7,7 +7,6 @@ let focusTime = 25 * 60;
 let pauseTime = 5 * 60;  
 let duration = 10 * 60;  
 
-// Ping-Variablen (Stoppuhr)
 let pingInterval = 0; 
 let pingCount = 0;
 let pingStartTime = 0;
